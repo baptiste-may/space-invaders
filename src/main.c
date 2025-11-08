@@ -1,7 +1,10 @@
-#include <stdio.h>
+#include "model/model.h"
 #include <stdlib.h>
 
 int main() {
-  printf("Hello world!\n");
+  Model model = {NULL};
+  startGame(&model);
+
+  destroyModel(&model);
   return EXIT_SUCCESS;
 }
