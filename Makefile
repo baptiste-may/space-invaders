@@ -23,6 +23,9 @@ run-sdl: $(TARGET)
 valgrind: $(TARGET)
 	@valgrind ./$(TARGET)
 
+doc:
+	doxygen
+
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
