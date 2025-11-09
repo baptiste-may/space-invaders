@@ -12,13 +12,13 @@ typedef struct {
 } Model;
 
 /**
- * @breif Start a game from a model
+ * @brief Start a game from a model
  *
  * @param model The model
  */
 Game *startGame(Model *model);
 /**
- * @breif Destroy the model by closing and freeing all things inside
+ * @brief Destroy the model by closing and freeing all things inside
  *
  * @param model The model
  */

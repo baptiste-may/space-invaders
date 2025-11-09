@@ -6,7 +6,7 @@ CFLAGS ?= -Wall -MMD -g
 else
 CFLAGS ?= -Wall -MMD -O3 -DNDEBUG
 endif
-LDFLAGS =
+LDFLAGS = -lncurses -lSDL2
 
 OBJS := $(shell find $(SRC_DIR) -name "*.c" | sed 's/.c$$/.o/g' | sed 's/$(SRC_DIR)/$(OBJ_DIR)/g')
 DEPS := $(OBJS:.o=.d)
@@ -21,7 +21,7 @@ run-sdl: $(TARGET)
 	@./$(TARGET) sdl
 
 valgrind: $(TARGET)
-	@valgrind ./$(TARGET)
+	@valgrind ./$(TARGET) ncurses
 
 doc:
 	doxygen

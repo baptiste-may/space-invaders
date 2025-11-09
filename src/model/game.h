@@ -21,7 +21,20 @@ typedef struct {
   char *aliens; //!< The grid of aliens where each number is a variety of alien
 } Game;
 
+/**
+ * @brief Create game structure
+ *
+ * @param nbAliens The number of aliens for each row
+ * @param nbAlienRows The number of alien rows
+ * @param nbBuildings The number of buildings between the aliens and the player
+ */
 Game *createGame(unsigned nbAliens, unsigned nbAlienRows, unsigned nbBuildings);
+
+/**
+ * @brief Free game structure
+ *
+ * @param game The game structure
+ */
 void freeGame(Game *game);
 
 #endif

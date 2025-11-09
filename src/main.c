@@ -5,7 +5,7 @@
 
 int main(int argc, char **args) {
   if (argc < 2) {
-    printf("Not anougth arguments\n");
+    printf("Not enough arguments\n");
     return EXIT_FAILURE;
   }
 
@@ -16,8 +16,11 @@ int main(int argc, char **args) {
   }
 
   Model model = {NULL};
-  startGame(&model);
+  initView(viewType);
 
+  loopView(viewType, &model);
+
+  closeView(viewType);
   destroyModel(&model);
   return EXIT_SUCCESS;
 }
