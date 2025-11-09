@@ -14,6 +14,15 @@ TARGET ?= main
 
 all: $(TARGET)
 
+run-ncurses: $(TARGET)
+	@./$(TARGET) ncurses
+
+run-sdl: $(TARGET)
+	@./$(TARGET) sdl
+
+valgrind: $(TARGET)
+	@valgrind ./$(TARGET)
+
 $(TARGET): $(OBJS)
 	$(CC) -o $(TARGET) $(OBJS) $(LDFLAGS)
 
@@ -23,8 +32,6 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 clean :
 	rm -rf $(OBJ_DIR)
-
-mrproper : clean
 	rm -f $(TARGET)
 
 -include $(DEPS)
