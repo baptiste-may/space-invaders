@@ -1,8 +1,9 @@
 #include "sdl-view.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_video.h>
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_timer.h>
+#include <SDL3/SDL_video.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -10,20 +11,19 @@ SDL_Window *win;
 SDL_Renderer *rend;
 
 void initViewSdl() {
-  if (SDL_Init(SDL_INIT_EVERYTHING)) {
+  if (SDL_Init(SDL_INIT_VIDEO)) {
     perror("Cannot initialize SDL");
     exit(EXIT_FAILURE);
   }
 
-  win = SDL_CreateWindow("Space Inviders", SDL_WINDOWPOS_CENTERED,
-                         SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
+  win = SDL_CreateWindow("Space Inviders", WIDTH, HEIGHT, 0);
   if (!win) {
     perror("Cannot create window");
     SDL_Quit();
     exit(EXIT_FAILURE);
   }
 
-  rend = SDL_CreateRenderer(win, -1, 0);
+  rend = SDL_CreateRenderer(win, NULL);
   if (!rend) {
     perror("Cannot render window");
     SDL_DestroyWindow(win);
