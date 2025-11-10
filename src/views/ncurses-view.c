@@ -1,20 +1,29 @@
 #include "ncurses-view.h"
 #include <ncurses.h>
+#include <string.h>
 
 int maxWidth, maxHeight;
+
 WINDOW *mainMenu;
+const char mainMenuTitle[] = "Space Inviders";
+const unsigned mainMenuWidth = 18, mainMenuHeight = 7, nbMainMenuButtons = 4;
+const char *mainMenuButtons[] = {"Play", "Settings", "About", "Quit"};
 int mainMenuSelection = 0;
 
 void drawMainMenu() {
   wclear(mainMenu);
-  wattrset(mainMenu, A_UNDERLINE);
-  mvwprintw(mainMenu, 0, 1, "Space Inviders");
-  wattrset(mainMenu, mainMenuSelection == 0 ? A_REVERSE : A_NORMAL);
-  mvwprintw(mainMenu, 2, 5, "Play");
-  wattrset(mainMenu, mainMenuSelection == 1 ? A_REVERSE : A_NORMAL);
-  mvwprintw(mainMenu, 3, 3, "Settings");
-  wattrset(mainMenu, mainMenuSelection == 2 ? A_REVERSE : A_NORMAL);
-  mvwprintw(mainMenu, 4, 5, "Quit");
+  mvwin(mainMenu, (maxHeight - mainMenuHeight) / 2,
+        (maxWidth - mainMenuWidth) / 2);
+  refresh();
+  box(mainMenu, 0, 0);
+  mvwprintw(mainMenu, 0, (mainMenuWidth - strlen(mainMenuTitle)) / 2,
+            mainMenuTitle);
+  for (int i = 0; i < nbMainMenuButtons; i++) {
+    wattrset(mainMenu, mainMenuSelection == i ? A_REVERSE : A_NORMAL);
+    mvwprintw(mainMenu, i + 2, (mainMenuWidth - strlen(mainMenuButtons[i])) / 2,
+              "%s", mainMenuButtons[i]);
+  }
+  wattrset(mainMenu, A_NORMAL);
   wrefresh(mainMenu);
 }
 
@@ -26,14 +35,11 @@ void initViewNcurses() {
   keypad(stdscr, TRUE);
 
   getmaxyx(stdscr, maxHeight, maxWidth);
-
-  int width = 16;
-  int height = 7;
+  refresh();
 
   mainMenu =
-      newwin(height, width, (maxHeight - height) / 2, (maxWidth - width) / 2);
-  box(mainMenu, 0, 0);
-  refresh();
+      newwin(mainMenuHeight, mainMenuWidth, (maxHeight - mainMenuHeight) / 2,
+             (maxWidth - mainMenuWidth) / 2);
   drawMainMenu();
 }
 
@@ -46,20 +52,24 @@ void loopViewNcurses(Model *model) {
   bool closeApp = FALSE;
   while (closeApp == FALSE) {
     switch (getch()) {
+    case KEY_RESIZE:
+      getmaxyx(stdscr, maxHeight, maxWidth);
+      drawMainMenu();
+      break;
     case '\n':
-      if (mainMenuSelection == 2)
+      if (mainMenuSelection == nbMainMenuButtons - 1)
         closeApp = TRUE;
       break;
     case 'z':
     case KEY_UP:
       mainMenuSelection--;
       if (mainMenuSelection < 0)
-        mainMenuSelection = 2;
+        mainMenuSelection = nbMainMenuButtons - 1;
       drawMainMenu();
       break;
     case 's':
     case KEY_DOWN:
-      mainMenuSelection = (mainMenuSelection + 1) % 3;
+      mainMenuSelection = (mainMenuSelection + 1) % nbMainMenuButtons;
       drawMainMenu();
       break;
     }
