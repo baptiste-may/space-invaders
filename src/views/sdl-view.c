@@ -1,9 +1,6 @@
 #include "sdl-view.h"
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_init.h>
-#include <SDL3/SDL_render.h>
-#include <SDL3/SDL_timer.h>
-#include <SDL3/SDL_video.h>
+#include <SDL3/SDL_main.h>
 #include <stdio.h>
 #include <stdlib.h>
 
