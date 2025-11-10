@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout@v5
 
       - uses: libsdl-org/setup-sdl@main
         id: sdl
