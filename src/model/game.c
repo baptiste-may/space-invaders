@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Game *createGame(unsigned int nbAliens, unsigned int nbAlienRows,
-                 unsigned int nbBuildings) {
+Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
+              unsigned int nbBuildings) {
   // Creating game
   Game *res = (Game *)malloc(sizeof(Game));
   if (res == NULL) {

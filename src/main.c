@@ -1,3 +1,4 @@
+#include "controller/controller.h"
 #include "model/model.h"
 #include "views/views.h"
 #include <stdio.h>
@@ -10,15 +11,11 @@ int main(int argc, char **args) {
   }
 
   ViewType viewType = getViewType(args[1]);
-  if (viewType == NOT_DEFINED) {
-    printf("View incorrect\n");
-    return EXIT_FAILURE;
-  }
+  Model model = newModel();
+  Controller controller = {&model, viewType};
+  initView(&controller);
 
-  Model model = {NULL};
-  initView(viewType);
-
-  loopView(viewType, &model);
+  mainLoop(&controller);
 
   closeView(viewType);
   destroyModel(&model);

@@ -1,6 +1,8 @@
 #include "views.h"
 #include "ncurses-view.h"
 #include "sdl-view.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 ViewType getViewType(const char *arg) {
@@ -8,20 +10,20 @@ ViewType getViewType(const char *arg) {
     return NCURSES;
   if (!strcmp(arg, "sdl"))
     return SDL;
-  return NOT_DEFINED;
+  perror("View type incorrect");
+  exit(EXIT_FAILURE);
 }
 
-void initView(ViewType viewType) {
-  switch (viewType) {
+void initView(Controller *controller) {
+  switch (controller->view) {
   case NCURSES:
-    initViewNcurses();
+    initViewNcurses(controller);
     break;
   case SDL:
-    initViewSdl();
-    break;
-  default:
+    initViewSdl(controller);
     break;
   }
+  controller->model->mainMenu.isOpen = true;
 }
 
 void closeView(ViewType viewType) {
@@ -32,20 +34,81 @@ void closeView(ViewType viewType) {
   case SDL:
     closeViewSdl();
     break;
-  default:
+  }
+}
+
+Event scanEvent(Controller *controller) {
+  switch (controller->view) {
+  case NCURSES:
+    return scanEventNcurses(controller);
+  case SDL:
+    return scanEventSdl(controller);
+  }
+  return NO_EVENT;
+}
+
+void createMainMenu(Controller *controller) {
+  switch (controller->view) {
+  case NCURSES:
+    createMainMenuNcurses(controller);
+    break;
+  case SDL:
+    break;
+  }
+}
+void updateMainMenu(Controller *controller) {
+  switch (controller->view) {
+  case NCURSES:
+    updateMainMenuNcurses(controller);
+    break;
+  case SDL:
+    break;
+  }
+}
+void destroyMainMenu(ViewType viewType) {
+  switch (viewType) {
+  case NCURSES:
+    destroyMainMenuNcurses();
+    break;
+  case SDL:
     break;
   }
 }
 
-void loopView(ViewType viewType, Model *model) {
-  switch (viewType) {
+void createGame(Controller *controller) {
+  switch (controller->view) {
   case NCURSES:
-    loopViewNcurses(model);
+    createGameNcurses(controller);
     break;
   case SDL:
-    loopViewSdl(model);
     break;
-  default:
+  }
+}
+void updateGame(Controller *controller) {
+  switch (controller->view) {
+  case NCURSES:
+    updateGameNcurses(controller);
+    break;
+  case SDL:
+    break;
+  }
+}
+void destroyGame(ViewType viewType) {
+  switch (viewType) {
+  case NCURSES:
+    destroyGameNcurses();
+    break;
+  case SDL:
+    break;
+  }
+}
+
+void resize(Controller *controller) {
+  switch (controller->view) {
+  case NCURSES:
+    resizeNcurses(controller);
+    break;
+  case SDL:
     break;
   }
 }

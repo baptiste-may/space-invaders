@@ -2,6 +2,7 @@
 #define MODEL_H
 
 #include "game.h"
+#include "main-menu.h"
 
 /**
  * @struct Model
@@ -9,7 +10,10 @@
  */
 typedef struct {
   Game *currentGame; //!< The current game, NULL is there is not
+  MainMenu mainMenu;
 } Model;
+
+Model newModel();
 
 /**
  * @brief Start a game from a model

@@ -1,12 +1,14 @@
 #include "sdl-view.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_timer.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 SDL_Window *win;
 SDL_Renderer *rend;
 
-void initViewSdl() {
+void initViewSdl(Controller *controller) {
   if (SDL_Init(SDL_INIT_VIDEO) == false) {
     fprintf(stderr, "Cannot initialize SDL: %s", SDL_GetError());
     exit(EXIT_FAILURE);
@@ -37,4 +39,19 @@ void closeViewSdl() {
   SDL_Quit();
 }
 
-void loopViewSdl(Model *model) { SDL_Delay(5000); }
+Event scanEventSdl(Controller *controller) {
+  SDL_Event event;
+  Event res = NO_EVENT;
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+    case SDL_EVENT_QUIT:
+      res = EVENT_CLOSE;
+      break;
+    case SDL_EVENT_KEY_DOWN:
+      res = EVENT_CLOSE;
+      break;
+    }
+  }
+  SDL_Delay(100);
+  return res;
+}

@@ -1,21 +1,28 @@
 #ifndef NCURSES_VIEW_H
 #define NCURSES_VIEW_H
 
-#include "../model/model.h"
+#include "views.h"
 
 /**
  * @brief Initialize view using ncurses
  */
-void initViewNcurses();
+void initViewNcurses(Controller *controller);
 
 /**
  * @brief Close view using ncurses
  */
 void closeViewNcurses();
 
-/**
- * @brief Loop view using ncurses
- */
-void loopViewNcurses(Model *model);
+Event scanEventNcurses(Controller *controller);
+
+void createMainMenuNcurses(Controller *controller);
+void updateMainMenuNcurses(Controller *controller);
+void destroyMainMenuNcurses();
+
+void createGameNcurses(Controller *controller);
+void updateGameNcurses(Controller *controller);
+void destroyGameNcurses();
+
+void resizeNcurses(Controller *controller);
 
 #endif

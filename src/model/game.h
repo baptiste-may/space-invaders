@@ -28,7 +28,7 @@ typedef struct {
  * @param nbAlienRows The number of alien rows
  * @param nbBuildings The number of buildings between the aliens and the player
  */
-Game *createGame(unsigned nbAliens, unsigned nbAlienRows, unsigned nbBuildings);
+Game *newGame(unsigned nbAliens, unsigned nbAlienRows, unsigned nbBuildings);
 
 /**
  * @brief Free game structure
