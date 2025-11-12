@@ -1,6 +1,6 @@
 #include "sdl-view.h"
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
+#include <SDL3/SDL_init.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,7 +8,7 @@ SDL_Window *win;
 SDL_Renderer *rend;
 
 void initViewSdl() {
-  if (SDL_Init(SDL_INIT_VIDEO)) {
+  if (SDL_Init(SDL_INIT_VIDEO) == false) {
     perror("Cannot initialize SDL");
     exit(EXIT_FAILURE);
   }
