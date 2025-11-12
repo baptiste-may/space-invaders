@@ -1,6 +1,5 @@
 #include "sdl-view.h"
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_init.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,20 +8,20 @@ SDL_Renderer *rend;
 
 void initViewSdl() {
   if (SDL_Init(SDL_INIT_VIDEO) == false) {
-    perror("Cannot initialize SDL");
+    fprintf(stderr, "Cannot initialize SDL: %s", SDL_GetError());
     exit(EXIT_FAILURE);
   }
 
-  win = SDL_CreateWindow("Space Inviders", WIDTH, HEIGHT, 0);
-  if (!win) {
-    perror("Cannot create window");
+  win = SDL_CreateWindow("Space Invaders", WIDTH, HEIGHT, 0);
+  if (win == NULL) {
+    fprintf(stderr, "Cannot create window: %s", SDL_GetError());
     SDL_Quit();
     exit(EXIT_FAILURE);
   }
 
   rend = SDL_CreateRenderer(win, NULL);
-  if (!rend) {
-    perror("Cannot render window");
+  if (rend == NULL) {
+    fprintf(stderr, "Cannot create renderer: %s", SDL_GetError());
     SDL_DestroyWindow(win);
     SDL_Quit();
     exit(EXIT_FAILURE);
