@@ -39,7 +39,7 @@ void closeViewSdl() {
   SDL_Quit();
 }
 
-Event scanEventSdl(Controller *controller) {
+Event scanEventSdl() {
   SDL_Event event;
   Event res = NO_EVENT;
   while (SDL_PollEvent(&event)) {

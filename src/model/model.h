@@ -10,9 +10,14 @@
  */
 typedef struct {
   Game *currentGame; //!< The current game, NULL is there is not
-  MainMenu mainMenu;
+  MainMenu mainMenu; //!< The informations about the main menu
 } Model;
 
+/**
+ * @brief Create a new model
+ *
+ * @return The model created
+ */
 Model newModel();
 
 /**
@@ -20,7 +25,7 @@ Model newModel();
  *
  * @param model The model
  */
-Game *startGame(Model *model);
+void *startGame(Model *model);
 /**
  * @brief Destroy the model by closing and freeing all things inside
  *

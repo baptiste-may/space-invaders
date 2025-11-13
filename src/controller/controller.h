@@ -3,21 +3,34 @@
 
 #include "../model/model.h"
 
+/**
+ * @enum Event
+ * @brief The event sended by the user every frame
+ */
 typedef enum {
-  NO_EVENT,
-  EVENT_KEY_UP,
-  EVENT_KEY_DOWN,
-  EVENT_KEY_ENTER,
-  EVENT_KEY_ESCAPE,
-  EVENT_RESIZE,
-  EVENT_CLOSE
+  NO_EVENT,         //!< No event was sended
+  EVENT_KEY_UP,     //!< Key pressed up
+  EVENT_KEY_DOWN,   //!< Key pressed down
+  EVENT_KEY_ENTER,  //!< Key pressed enter
+  EVENT_KEY_ESCAPE, //!< Key pressed escape
+  EVENT_RESIZE,     //!< The window is resized
+  EVENT_CLOSE       //!< The window is closed
 } Event;
 
+/**
+ * @struct Controller
+ * @brief The structure of the controller
+ */
 typedef struct {
-  Model *model;
-  int view;
+  Model *model; //!< The model where the informations are stocked
+  int view;     //!< The view used for the user
 } Controller;
 
+/**
+ * @brief The main loop of the controller
+ *
+ * @param controller The controller used
+ */
 void mainLoop(Controller *controller);
 
 #endif

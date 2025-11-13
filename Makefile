@@ -35,6 +35,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 clean :
 	rm -rf $(OBJ_DIR)
+	rm -rf doc
 	rm -f $(TARGET)
 
 -include $(DEPS)

@@ -6,26 +6,24 @@
 /**
  * @enum ViewType
  * @brief The type of view used to play the game
- *
- * @var ViewType NCURSES
- * @brief The app use Ncurses for the view
- *
- * @var ViewType SDL
- * @brief The app use SDL2 for the view
  */
-typedef enum { NCURSES, SDL } ViewType;
+typedef enum {
+  NCURSES, //!< The app use Ncurses for the view
+  SDL      //!< The app use SDL3 for the view
+} ViewType;
 
 /**
  * @brief Return the correct enum depending on the string argument
  *
  * @param arg The string argument
+ * @return The view type
  */
 ViewType getViewType(const char *arg);
 
 /**
- * @brief Initialize view depending on view type
+ * @brief Initialize view depending on the controller
  *
- * @param viewType The type of the view
+ * @param controller The controller used
  */
 void initView(Controller *controller);
 
@@ -36,16 +34,57 @@ void initView(Controller *controller);
  */
 void closeView(ViewType viewType);
 
-Event scanEvent(Controller *controller);
+/**
+ * @brief Scan the current event depending on the view type
+ *
+ * @param viewType The type of the view
+ * @return The current event
+ */
+Event scanEvent(ViewType viewType);
 
+/**
+ * @brief Create the main menu depending on the controller
+ *
+ * @param controller The controller used
+ */
 void createMainMenu(Controller *controller);
+/**
+ * @brief Update the main menu depending on the controller
+ *
+ * @param controller The controller used
+ */
 void updateMainMenu(Controller *controller);
+/**
+ * @brief Destroy the main menu depending on the view type
+ *
+ * @param viewType The type of the view
+ */
 void destroyMainMenu(ViewType viewType);
 
+/**
+ * @brief Create game window depending on the controller
+ *
+ * @param controller The controller used
+ */
 void createGame(Controller *controller);
+/**
+ * @brief Update the game window depending on the controller
+ *
+ * @param controller The controller used
+ */
 void updateGame(Controller *controller);
+/**
+ * @brief Destroy the game window depending on the view type
+ *
+ * @param viewType The type of the view
+ */
 void destroyGame(ViewType viewType);
 
+/**
+ * @brief Resize all windows depending on the controller
+ *
+ * @param controller The controller used
+ */
 void resize(Controller *controller);
 
 #endif

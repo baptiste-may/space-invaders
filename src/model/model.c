@@ -5,7 +5,7 @@
 
 Model newModel() { return (Model){NULL, (MainMenu){false, 0}}; }
 
-Game *startGame(Model *model) {
+void *startGame(Model *model) {
   model->currentGame = newGame(5, 11, 4);
   return model->currentGame;
 }

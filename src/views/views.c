@@ -37,12 +37,12 @@ void closeView(ViewType viewType) {
   }
 }
 
-Event scanEvent(Controller *controller) {
-  switch (controller->view) {
+Event scanEvent(ViewType viewType) {
+  switch (viewType) {
   case NCURSES:
-    return scanEventNcurses(controller);
+    return scanEventNcurses();
   case SDL:
-    return scanEventSdl(controller);
+    return scanEventSdl();
   }
   return NO_EVENT;
 }

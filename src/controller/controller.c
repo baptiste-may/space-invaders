@@ -11,7 +11,7 @@ void mainLoop(Controller *controller) {
   bool closeApp = false;
   Event event;
   while (closeApp == false) {
-    event = scanEvent(controller);
+    event = scanEvent(controller->view);
 
     if (event == EVENT_RESIZE) {
       resize(controller);

@@ -97,7 +97,7 @@ void closeViewNcurses() {
   endwin();
 }
 
-Event scanEventNcurses(Controller *controller) {
+Event scanEventNcurses() {
   int ch = getch();
   switch (ch) {
   case ERR:
