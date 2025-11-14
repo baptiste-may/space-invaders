@@ -4,8 +4,11 @@
 #include "../model/model.h"
 #include "views.h"
 
-#define WIDTH 600
-#define HEIGHT 400
+#define WIDTH 1280
+#define HEIGHT 720
+#define FONT_SIZE 24
+
+typedef enum { LEFT, CENTER, RIGHT } TextAlign;
 
 /**
  * @brief Initialize view using sdl

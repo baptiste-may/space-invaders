@@ -53,6 +53,7 @@ void createMainMenu(Controller *controller) {
     createMainMenuNcurses(controller);
     break;
   case SDL:
+    createMainMenuSdl(controller);
     break;
   }
 }
@@ -62,6 +63,7 @@ void updateMainMenu(Controller *controller) {
     updateMainMenuNcurses(controller);
     break;
   case SDL:
+    updateMainMenuSdl(controller);
     break;
   }
 }
@@ -71,6 +73,7 @@ void destroyMainMenu(ViewType viewType) {
     destroyMainMenuNcurses();
     break;
   case SDL:
+    destroyMainMenuSdl();
     break;
   }
 }
@@ -81,6 +84,7 @@ void createGame(Controller *controller) {
     createGameNcurses(controller);
     break;
   case SDL:
+    createGameSdl(controller);
     break;
   }
 }
@@ -90,6 +94,7 @@ void updateGame(Controller *controller) {
     updateGameNcurses(controller);
     break;
   case SDL:
+    updateGameSdl(controller);
     break;
   }
 }
@@ -99,6 +104,7 @@ void destroyGame(ViewType viewType) {
     destroyGameNcurses();
     break;
   case SDL:
+    destroyGameSdl();
     break;
   }
 }
@@ -109,6 +115,7 @@ void resize(Controller *controller) {
     resizeNcurses(controller);
     break;
   case SDL:
+    resizeSdl(controller);
     break;
   }
 }
