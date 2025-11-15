@@ -108,15 +108,23 @@ Event scanEventSdl() {
 
 void renderText(const char *text, float x, float y, SDL_Color color,
                 TextAlign textAlign) {
-  const float textSize = strlen(text) * ((float)(FONT_SIZE) / 2);
+  int text_width, text_height;
+  TTF_GetStringSize(font, text, 0, &text_width, &text_height);
+
   SDL_Surface *surface = TTF_RenderText_Solid(font, text, strlen(text), color);
   SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface);
-  float finalX =
-      textAlign == LEFT
-          ? (float)(FONT_SIZE)
-          : (textAlign == RIGHT ? x - textSize + ((float)(FONT_SIZE) / 2)
-                                : x - (float)(textSize) / 2);
-  SDL_FRect rect = {finalX, y, (float)surface->w, (float)surface->h};
+
+  float finalX;
+  if (textAlign == LEFT) {
+    finalX = x;
+  } else if (textAlign == RIGHT) {
+    finalX = x - (float)text_width;
+  } else {
+    finalX = x - (float)text_width / 2;
+  }
+
+  SDL_FRect rect = {finalX, y - (float)text_height / 2, (float)surface->w,
+                    (float)surface->h};
   SDL_RenderTexture(rend, texture, NULL, &rect);
   SDL_DestroyTexture(texture);
   SDL_DestroySurface(surface);

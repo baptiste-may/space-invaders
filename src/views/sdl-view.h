@@ -6,7 +6,7 @@
 
 #define WIDTH 1280
 #define HEIGHT 720
-#define FONT_SIZE 24
+#define FONT_SIZE 36
 
 typedef enum { LEFT, CENTER, RIGHT } TextAlign;
 
