@@ -1,4 +1,5 @@
 #include "sdl-view.h"
+#include "views.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
@@ -14,6 +15,7 @@
 #include <string.h>
 
 int width, height;
+double scale = 1;
 
 SDL_Window *win = NULL;
 SDL_Renderer *rend = NULL;
@@ -29,10 +31,7 @@ void initViewSdl(Controller *controller) {
     exit(EXIT_FAILURE);
   }
 
-  width = WIDTH;
-  height = HEIGHT;
-
-  win = SDL_CreateWindow("Space Invaders", width, height, 0);
+  win = SDL_CreateWindow("Space Invaders", WIDTH, HEIGHT, 0);
   if (win == NULL) {
     fprintf(stderr, "Cannot create window: %s", SDL_GetError());
     closeViewSdl();
@@ -69,6 +68,8 @@ void initViewSdl(Controller *controller) {
 
   SDL_RenderClear(rend);
   SDL_RenderPresent(rend);
+
+  resize(controller);
 
   createMainMenuSdl(controller);
 }
@@ -203,9 +204,8 @@ void updateGameSdl(Controller *controller) {
     renderText(lives, width - 20, 30, white, RIGHT);
 
     // Player
-    int playerScale = 4;
-    int playerSizeX = 13 * playerScale;
-    int playerSizeY = 8 * playerScale;
+    float playerSizeX = 13 * scale;
+    float playerSizeY = 8 * scale;
     float playerX = game->playerPosition * (width - playerSizeX * 2) +
                     (float)(playerSizeX) / 2;
     SDL_FRect playerRect = {playerX, height - playerSizeY - 20, playerSizeX,
@@ -220,4 +220,5 @@ void destroyGameSdl() {}
 
 void resizeSdl(Controller *controller) {
   SDL_GetWindowSize(win, &width, &height);
+  scale = (double)(width) / 640 + (double)(height) / 480;
 }

@@ -21,6 +21,8 @@ typedef struct {
   char *aliens; //!< The grid of aliens where each number is a variety of alien
 
   double playerPosition; //!< The player position in pourcentage
+  double playerShootX;   //!< The x coords of the player shoot
+  double playerShootY;   //!< The y coords of the player shoot
 } Game;
 
 /**

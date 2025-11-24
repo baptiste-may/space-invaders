@@ -10,8 +10,8 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
     perror("Allocation error");
     exit(EXIT_FAILURE);
   }
-  *res =
-      (Game){0, DEFAULT_LIVES, nbAliens, nbAlienRows, nbBuildings, NULL, 0.5f};
+  *res = (Game){0,    DEFAULT_LIVES, nbAliens, nbAlienRows, nbBuildings,
+                NULL, 0.5,           -1,       -1};
 
   // Building aliens
   res->aliens = (char *)calloc(sizeof(char), nbAlienRows * nbAliens);
