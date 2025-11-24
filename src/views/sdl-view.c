@@ -1,8 +1,13 @@
 #include "sdl-view.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_events.h>
+#include <SDL3/SDL_init.h>
+#include <SDL3/SDL_keycode.h>
+#include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_render.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
+#include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,9 +15,10 @@
 
 int width, height;
 
-SDL_Window *win;
-SDL_Renderer *rend;
-TTF_Font *font;
+SDL_Window *win = NULL;
+SDL_Renderer *rend = NULL;
+TTF_Font *font = NULL;
+SDL_Texture *playerTexture = NULL;
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color black = {0, 0, 0, 255};
@@ -29,33 +35,35 @@ void initViewSdl(Controller *controller) {
   win = SDL_CreateWindow("Space Invaders", width, height, 0);
   if (win == NULL) {
     fprintf(stderr, "Cannot create window: %s", SDL_GetError());
-    SDL_Quit();
+    closeViewSdl();
     exit(EXIT_FAILURE);
   }
 
   rend = SDL_CreateRenderer(win, NULL);
   if (rend == NULL) {
     fprintf(stderr, "Cannot create renderer: %s", SDL_GetError());
-    SDL_DestroyWindow(win);
-    SDL_Quit();
+    closeViewSdl();
     exit(EXIT_FAILURE);
   }
 
+  playerTexture = IMG_LoadTexture(rend, "assets/player.png");
+  if (playerTexture == NULL) {
+    fprintf(stderr, "Cannot load player texture: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+  SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
+
   if (TTF_Init() == false) {
     fprintf(stderr, "Cannot initialize TTF: %s", SDL_GetError());
-    SDL_DestroyRenderer(rend);
-    SDL_DestroyWindow(win);
-    SDL_Quit();
+    closeViewSdl();
     exit(EXIT_FAILURE);
   }
 
   font = TTF_OpenFont("assets/editundo.ttf", FONT_SIZE);
   if (font == NULL) {
     fprintf(stderr, "Cannot load font: %s", SDL_GetError());
-    TTF_Quit();
-    SDL_DestroyRenderer(rend);
-    SDL_DestroyWindow(win);
-    SDL_Quit();
+    closeViewSdl();
     exit(EXIT_FAILURE);
   }
 
@@ -66,10 +74,15 @@ void initViewSdl(Controller *controller) {
 }
 
 void closeViewSdl() {
-  TTF_CloseFont(font);
+  if (font != NULL)
+    TTF_CloseFont(font);
   TTF_Quit();
-  SDL_DestroyRenderer(rend);
-  SDL_DestroyWindow(win);
+  if (playerTexture != NULL)
+    SDL_DestroyTexture(playerTexture);
+  if (rend != NULL)
+    SDL_DestroyRenderer(rend);
+  if (win != NULL)
+    SDL_DestroyWindow(win);
   SDL_Quit();
 }
 
@@ -86,11 +99,21 @@ Event scanEventSdl() {
       break;
     case SDL_EVENT_KEY_DOWN:
       switch (event.key.key) {
+      case SDLK_Z:
       case SDLK_UP:
         res = EVENT_KEY_UP;
         break;
+      case SDLK_S:
       case SDLK_DOWN:
         res = EVENT_KEY_DOWN;
+        break;
+      case SDLK_Q:
+      case SDLK_LEFT:
+        res = EVENT_KEY_LEFT;
+        break;
+      case SDLK_D:
+      case SDLK_RIGHT:
+        res = EVENT_KEY_RIGHT;
         break;
       case SDLK_RETURN:
         res = EVENT_KEY_ENTER;
@@ -168,13 +191,26 @@ void updateGameSdl(Controller *controller) {
 
   if (model->currentGame != NULL) {
     Game *game = model->currentGame;
+
+    // Score
     char score[20];
     sprintf(score, "Score: %d", game->score);
-    renderText(score, 20, 20, white, LEFT);
+    renderText(score, 20, 30, white, LEFT);
 
+    // Lives
     char lives[20];
     sprintf(lives, "Lives: %d", game->lives);
-    renderText(lives, width - 20, 20, white, RIGHT);
+    renderText(lives, width - 20, 30, white, RIGHT);
+
+    // Player
+    int playerScale = 4;
+    int playerSizeX = 13 * playerScale;
+    int playerSizeY = 8 * playerScale;
+    float playerX = game->playerPosition * (width - playerSizeX * 2) +
+                    (float)(playerSizeX) / 2;
+    SDL_FRect playerRect = {playerX, height - playerSizeY - 20, playerSizeX,
+                            playerSizeY};
+    SDL_RenderTexture(rend, playerTexture, NULL, &playerRect);
   }
 
   SDL_RenderPresent(rend);

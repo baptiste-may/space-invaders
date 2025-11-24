@@ -62,11 +62,18 @@ void updateGameNcurses(Controller *controller) {
   wresize(gameWin, maxHeight, maxWidth);
   box(gameWin, 0, 0);
 
+  // Score and lives
   if (controller->model->currentGame != NULL) {
     Game *game = controller->model->currentGame;
 
+    // Score and lives
     mvwprintw(gameWin, 2, 2, "Score: %d", game->score);
     mvwprintw(gameWin, 2, maxWidth - 10, "Lives: %d", game->lives);
+
+    // Player
+    int playerPosition = game->playerPosition * (maxWidth - 7) + 3;
+    mvwprintw(gameWin, maxHeight - 3, playerPosition - 1, "/ \\");
+    mvwprintw(gameWin, maxHeight - 2, playerPosition - 2, "[___]");
   }
 
   wrefresh(gameWin);
@@ -108,6 +115,12 @@ Event scanEventNcurses() {
   case 's':
   case KEY_DOWN:
     return EVENT_KEY_DOWN;
+  case 'q':
+  case KEY_LEFT:
+    return EVENT_KEY_LEFT;
+  case 'd':
+  case KEY_RIGHT:
+    return EVENT_KEY_RIGHT;
   case KEY_RESIZE:
     return EVENT_RESIZE;
   case '\n':

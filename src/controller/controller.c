@@ -64,13 +64,21 @@ void mainLoop(Controller *controller) {
     }
 
     if (model->currentGame != NULL) {
+      Game *game = model->currentGame;
       switch (event) {
       case EVENT_KEY_ESCAPE:
         createMainMenu(controller);
         mainMenu->isOpen = true;
         break;
-      case EVENT_KEY_UP:
-        model->currentGame->score++;
+      case EVENT_KEY_LEFT:
+        game->playerPosition -= PLAYER_SPEED;
+        if (game->playerPosition < 0)
+          game->playerPosition = 0;
+        break;
+      case EVENT_KEY_RIGHT:
+        game->playerPosition += PLAYER_SPEED;
+        if (game->playerPosition > 1)
+          game->playerPosition = 1;
         break;
       default:
         break;

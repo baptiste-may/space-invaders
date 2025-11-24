@@ -19,6 +19,8 @@ typedef struct {
   unsigned nbBuildings; //!< The number of buildings between the aliens and the
                         //!< player
   char *aliens; //!< The grid of aliens where each number is a variety of alien
+
+  double playerPosition; //!< The player position in pourcentage
 } Game;
 
 /**

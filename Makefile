@@ -6,7 +6,7 @@ CFLAGS ?= -Wall -MMD -g
 else
 CFLAGS ?= -Wall -MMD -O3 -DNDEBUG
 endif
-LDFLAGS = -lncurses -lSDL3 -lSDL3_ttf
+LDFLAGS = -lncurses -lSDL3 -lSDL3_ttf -lSDL3_image
 
 OBJS := $(shell find $(SRC_DIR) -name "*.c" | sed 's/.c$$/.o/g' | sed 's/$(SRC_DIR)/$(OBJ_DIR)/g')
 DEPS := $(OBJS:.o=.d)

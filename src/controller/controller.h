@@ -3,6 +3,8 @@
 
 #include "../model/model.h"
 
+#define PLAYER_SPEED 0.005
+
 /**
  * @enum Event
  * @brief The event sended by the user every frame
@@ -11,6 +13,8 @@ typedef enum {
   NO_EVENT,         //!< No event was sended
   EVENT_KEY_UP,     //!< Key pressed up
   EVENT_KEY_DOWN,   //!< Key pressed down
+  EVENT_KEY_LEFT,   //!< Key pressed left
+  EVENT_KEY_RIGHT,  //!< Key pressed right
   EVENT_KEY_ENTER,  //!< Key pressed enter
   EVENT_KEY_ESCAPE, //!< Key pressed escape
   EVENT_RESIZE,     //!< The window is resized
