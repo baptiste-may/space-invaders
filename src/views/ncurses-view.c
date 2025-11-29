@@ -62,7 +62,7 @@ void updateGameNcurses(Controller *controller) {
   wresize(gameWin, maxHeight, maxWidth);
   box(gameWin, 0, 0);
 
-  // Score and lives
+  // Print game
   if (controller->model->currentGame != NULL) {
     Game *game = controller->model->currentGame;
 
@@ -74,6 +74,11 @@ void updateGameNcurses(Controller *controller) {
     int playerPosition = game->playerPosition * (maxWidth - 7) + 3;
     mvwprintw(gameWin, maxHeight - 3, playerPosition - 1, "/ \\");
     mvwprintw(gameWin, maxHeight - 2, playerPosition - 2, "[___]");
+
+    // Player shoot
+    int playerShootX = game->playerShootX * (maxWidth - 7) + 3;
+    int playerShootY = game->playerShootY * (maxHeight - 4) + 2;
+    mvwprintw(gameWin, playerShootY, playerShootX, "|");
   }
 
   wrefresh(gameWin);
@@ -127,6 +132,8 @@ Event scanEventNcurses() {
     return EVENT_KEY_ENTER;
   case 27:
     return EVENT_KEY_ESCAPE;
+  case ' ':
+    return EVENT_KEY_SPACE;
   }
   return NO_EVENT;
 }

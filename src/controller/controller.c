@@ -71,18 +71,18 @@ void mainLoop(Controller *controller) {
         mainMenu->isOpen = true;
         break;
       case EVENT_KEY_LEFT:
-        game->playerPosition -= PLAYER_SPEED;
-        if (game->playerPosition < 0)
-          game->playerPosition = 0;
+        movePlayerLeft(game);
         break;
       case EVENT_KEY_RIGHT:
-        game->playerPosition += PLAYER_SPEED;
-        if (game->playerPosition > 1)
-          game->playerPosition = 1;
+        movePlayerRight(game);
+        break;
+      case EVENT_KEY_SPACE:
+        playerShoot(game);
         break;
       default:
         break;
       }
+      nextFrame(game);
       updateGame(controller);
     }
   }

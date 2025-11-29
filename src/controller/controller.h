@@ -1,9 +1,6 @@
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#pragma once
 
 #include "../model/model.h"
-
-#define PLAYER_SPEED 0.005
 
 /**
  * @enum Event
@@ -18,7 +15,8 @@ typedef enum {
   EVENT_KEY_ENTER,  //!< Key pressed enter
   EVENT_KEY_ESCAPE, //!< Key pressed escape
   EVENT_RESIZE,     //!< The window is resized
-  EVENT_CLOSE       //!< The window is closed
+  EVENT_CLOSE,      //!< The window is closed
+  EVENT_KEY_SPACE   //!< Key pressed space
 } Event;
 
 /**
@@ -36,5 +34,3 @@ typedef struct {
  * @param controller The controller used
  */
 void mainLoop(Controller *controller);
-
-#endif

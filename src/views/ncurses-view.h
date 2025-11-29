@@ -1,5 +1,4 @@
-#ifndef NCURSES_VIEW_H
-#define NCURSES_VIEW_H
+#pragma once
 
 #include "views.h"
 
@@ -60,5 +59,3 @@ void destroyGameNcurses();
  * @param The controller used
  */
 void resizeNcurses(Controller *controller);
-
-#endif

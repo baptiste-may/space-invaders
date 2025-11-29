@@ -1,5 +1,4 @@
-#ifndef VIEWS_H
-#define VIEWS_H
+#pragma once
 
 #include "../controller/controller.h"
 
@@ -86,5 +85,3 @@ void destroyGame(ViewType viewType);
  * @param controller The controller used
  */
 void resize(Controller *controller);
-
-#endif

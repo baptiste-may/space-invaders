@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 #include "game.h"
 #include "main-menu.h"
@@ -32,5 +31,3 @@ void *startGame(Model *model);
  * @param model The model
  */
 void destroyModel(Model *model);
-
-#endif

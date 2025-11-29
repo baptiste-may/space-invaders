@@ -1,5 +1,4 @@
-#ifndef MAIN_MENU_H
-#define MAIN_MENU_H
+#pragma once
 
 #include <stdbool.h>
 
@@ -11,5 +10,3 @@ typedef struct {
   bool isOpen;  //!< Is the main menu open
   int selected; //!< The selected option
 } MainMenu;
-
-#endif

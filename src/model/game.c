@@ -34,3 +34,31 @@ void freeGame(Game *game) {
   game->aliens = NULL;
   free(game);
 }
+
+void nextFrame(Game *game) {
+  // Player shoot
+  if (game->playerShootX != -1 && game->playerShootY >= 0) {
+    game->playerShootY -= SHOOT_SPEED;
+    if (game->playerShootY <= 0)
+      game->playerShootY = -1;
+  }
+}
+
+void movePlayerLeft(Game *game) {
+  game->playerPosition -= PLAYER_SPEED;
+  if (game->playerPosition < 0)
+    game->playerPosition = 0;
+}
+
+void movePlayerRight(Game *game) {
+  game->playerPosition += PLAYER_SPEED;
+  if (game->playerPosition > 1)
+    game->playerPosition = 1;
+}
+
+void playerShoot(Game *game) {
+  if (game->playerShootX != -1 && game->playerShootY >= 0)
+    return;
+  game->playerShootX = game->playerPosition;
+  game->playerShootY = 1;
+}

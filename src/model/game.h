@@ -1,11 +1,14 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 /**
  * @def DEFAULT_LIVES
  * @brief The number of lives when starting a game
  */
 #define DEFAULT_LIVES 3
+
+#define PLAYER_SPEED 0.005
+
+#define SHOOT_SPEED 0.01
 
 /**
  * @struct Game
@@ -43,4 +46,8 @@ Game *newGame(unsigned nbAliens, unsigned nbAlienRows, unsigned nbBuildings);
  */
 void freeGame(Game *game);
 
-#endif
+void nextFrame(Game *game);
+
+void movePlayerLeft(Game *game);
+void movePlayerRight(Game *game);
+void playerShoot(Game *game);

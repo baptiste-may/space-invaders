@@ -1,5 +1,4 @@
-#ifndef SDL_VIEW_H
-#define SDL_VIEW_H
+#pragma once
 
 #include "../model/model.h"
 #include "views.h"
@@ -71,5 +70,3 @@ void destroyGameSdl();
  * @param controller THe controller used
  */
 void resizeSdl(Controller *controller);
-
-#endif

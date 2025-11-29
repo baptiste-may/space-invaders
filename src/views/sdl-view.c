@@ -5,11 +5,13 @@
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_oldnames.h>
+#include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -122,6 +124,9 @@ Event scanEventSdl() {
       case SDLK_ESCAPE:
         res = EVENT_KEY_ESCAPE;
         break;
+      case SDLK_SPACE:
+        res = EVENT_KEY_SPACE;
+        break;
       }
       break;
     }
@@ -211,6 +216,15 @@ void updateGameSdl(Controller *controller) {
     SDL_FRect playerRect = {playerX, height - playerSizeY - 20, playerSizeX,
                             playerSizeY};
     SDL_RenderTexture(rend, playerTexture, NULL, &playerRect);
+
+    // Player shoot
+    double shootY = game->playerShootY * (height - (20 + playerSizeY) * 2) +
+                    20 + playerSizeY / 2;
+    SDL_FRect shootRect = {game->playerShootX * (width - playerSizeX * 2) +
+                               playerSizeX - scale / 2,
+                           shootY, scale, 4 * scale};
+    SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+    SDL_RenderFillRect(rend, &shootRect);
   }
 
   SDL_RenderPresent(rend);
