@@ -6,8 +6,16 @@
  */
 #define DEFAULT_LIVES 3
 
+/**
+ * @def PLAYER_SPEED
+ * @brief The player speed
+ */
 #define PLAYER_SPEED 0.005
 
+/**
+ * @def SHOOT_SPEED
+ * @brief The player shoot speed
+ */
 #define SHOOT_SPEED 0.01
 
 /**
@@ -46,8 +54,30 @@ Game *newGame(unsigned nbAliens, unsigned nbAlienRows, unsigned nbBuildings);
  */
 void freeGame(Game *game);
 
+/**
+ * @brief Calculate next frame
+ *
+ * @param game The game structure
+ */
 void nextFrame(Game *game);
 
+/**
+ * @brief Move the player to the left
+ *
+ * @param game The game structure
+ */
 void movePlayerLeft(Game *game);
+
+/**
+ * @brief Move the player to the right
+ *
+ * @param game The game structure
+ */
 void movePlayerRight(Game *game);
+
+/**
+ * @brief Shoot as player is possible
+ *
+ * @param game The game structure
+ */
 void playerShoot(Game *game);
