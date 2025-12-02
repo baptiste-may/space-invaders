@@ -1,12 +1,14 @@
 #include "sdl-view.h"
 #include "views.h"
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_error.h>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_keycode.h>
 #include <SDL3/SDL_oldnames.h>
 #include <SDL3/SDL_rect.h>
 #include <SDL3/SDL_render.h>
+#include <SDL3/SDL_surface.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 #include <SDL3_image/SDL_image.h>
@@ -23,6 +25,7 @@ SDL_Window *win = NULL;
 SDL_Renderer *rend = NULL;
 TTF_Font *font = NULL;
 SDL_Texture *playerTexture = NULL;
+SDL_Texture *aliensTextures[4][2];
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color black = {0, 0, 0, 255};
@@ -47,6 +50,7 @@ void initViewSdl(Controller *controller) {
     exit(EXIT_FAILURE);
   }
 
+  // Load player texture
   playerTexture = IMG_LoadTexture(rend, "assets/player.png");
   if (playerTexture == NULL) {
     fprintf(stderr, "Cannot load player texture: %s", SDL_GetError());
@@ -54,6 +58,26 @@ void initViewSdl(Controller *controller) {
     exit(EXIT_FAILURE);
   }
   SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
+
+  // Load aliens textures
+  for (unsigned i = 1; i <= 4; i++) {
+    char imagePath[20];
+    for (unsigned j = 1; j <= 2; j++) {
+      if (i != 4)
+        sprintf(imagePath, "assets/alien%u-%u.png", i, j);
+      else
+        sprintf(imagePath, "assets/alien4.png");
+      aliensTextures[i - 1][j - 1] = IMG_LoadTexture(rend, imagePath);
+      if (aliensTextures[i - 1][j - 1] == NULL) {
+        fprintf(stderr, "Cannot load alien n°%u with texture n°%u: %s", i, j,
+                SDL_GetError());
+        closeViewSdl();
+        exit(EXIT_FAILURE);
+      }
+      SDL_SetTextureScaleMode(aliensTextures[i - 1][j - 1],
+                              SDL_SCALEMODE_NEAREST);
+    }
+  }
 
   if (TTF_Init() == false) {
     fprintf(stderr, "Cannot initialize TTF: %s", SDL_GetError());
@@ -82,6 +106,12 @@ void closeViewSdl() {
   TTF_Quit();
   if (playerTexture != NULL)
     SDL_DestroyTexture(playerTexture);
+  for (unsigned i = 0; i < 4; i++) {
+    for (unsigned j = 0; j < 2; j++) {
+      if (aliensTextures[i][j] != NULL)
+        SDL_DestroyTexture(aliensTextures[i][j]);
+    }
+  }
   if (rend != NULL)
     SDL_DestroyRenderer(rend);
   if (win != NULL)
@@ -144,13 +174,12 @@ void renderText(const char *text, float x, float y, SDL_Color color,
   SDL_Texture *texture = SDL_CreateTextureFromSurface(rend, surface);
 
   float finalX;
-  if (textAlign == LEFT) {
+  if (textAlign == LEFT)
     finalX = x;
-  } else if (textAlign == RIGHT) {
+  else if (textAlign == RIGHT)
     finalX = x - (float)text_width;
-  } else {
+  else
     finalX = x - (float)text_width / 2;
-  }
 
   SDL_FRect rect = {finalX, y - (float)text_height / 2, (float)surface->w,
                     (float)surface->h};
@@ -225,6 +254,27 @@ void updateGameSdl(Controller *controller) {
                            shootY, scale, 4 * scale};
     SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
     SDL_RenderFillRect(rend, &shootRect);
+
+    // Aliens
+    for (unsigned i = 0; i < game->nbAlienRows; i++) {
+      for (unsigned j = 0; j < game->nbAliens; j++) {
+        unsigned alienIndex = game->aliens[j + i * game->nbAliens];
+        SDL_Texture *alienTexture = aliensTextures[alienIndex / 2][0];
+
+        float alienSizeX, alienSizeY;
+        SDL_GetTextureSize(alienTexture, &alienSizeX, &alienSizeY);
+        alienSizeX *= scale, alienSizeY *= scale;
+
+        double alienX = ((width - 100) / (double)(game->nbAliens)) * j + 50 +
+                        game->aliensX * 100;
+        double alienY = 100 + 50 * i + game->aliensY * 150;
+
+        SDL_FRect alienRect = {alienX - alienSizeX / 2, alienY - alienSizeY / 2,
+                               alienSizeX, alienSizeY};
+        SDL_RenderTexture(rend, aliensTextures[alienIndex / 2][alienIndex % 2],
+                          NULL, &alienRect);
+      }
+    }
   }
 
   SDL_RenderPresent(rend);
