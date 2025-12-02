@@ -258,7 +258,13 @@ void updateGameSdl(Controller *controller) {
     // Aliens
     for (unsigned i = 0; i < game->nbAlienRows; i++) {
       for (unsigned j = 0; j < game->nbAliens; j++) {
-        unsigned alienIndex = game->aliens[j + i * game->nbAliens];
+        unsigned k = j + i * game->nbAliens;
+        int alienIndex = game->aliens[k];
+        
+        // Ne pas afficher les aliens morts
+        if (alienIndex < 0)
+          continue;
+        
         SDL_Texture *alienTexture = aliensTextures[alienIndex / 2][0];
 
         float alienSizeX, alienSizeY;
