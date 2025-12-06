@@ -2,3 +2,6 @@ build
 doc
 main
 vgcore*
+3rdParty/SDL/build
+3rdParty/SDL_image/build
+3rdParty/SDL_ttf/build

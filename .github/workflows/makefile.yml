@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Code Checkout
         uses: actions/checkout@v4
-    
+
       - name: Install dependancies
         run: |
           sudo apt-get update
@@ -25,42 +25,6 @@ jobs:
             libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev libpipewire-0.3-dev \
             libwayland-dev libdecor-0-dev liburing-dev libfreetype6-dev libharfbuzz-dev \
             libjpeg-dev libpng-dev libtiff-dev libwebp-dev
-    
-      - name: Install SDL3
-        run: |
-          cd /tmp
-          git clone --depth 1 https://github.com/libsdl-org/SDL.git SDL3
-          cd SDL3
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          make -j$(nproc)
-          sudo make install
-          sudo ldconfig
 
-      - name: Install SDL3_image
-        run: |
-          cd /tmp
-          git clone --depth 1 https://github.com/libsdl-org/SDL_image.git SDL3_image
-          cd SDL3_image
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          make -j$(nproc)
-          sudo make install
-          sudo ldconfig
-
-      - name: Install SDL3_ttf
-        run: |
-          cd /tmp
-          git clone --depth 1 https://github.com/libsdl-org/SDL_ttf.git SDL3_ttf
-          cd SDL3_ttf
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          make -j$(nproc)
-          sudo make install
-          sudo ldconfig
-    
       - name: Test with make
         run: make
