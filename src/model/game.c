@@ -98,7 +98,7 @@ void checkCollisions(Game *game, int screenWidth, int screenHeight) {
           default: game->score += 100; break; // Alien Rouge (faire la règle du mod(15))
         }
 
-        return; // Un tir ne peut toucher qu'un seul alien
+        return; // Fini car un alien par tir
       }
     }
   }
