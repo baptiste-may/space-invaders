@@ -17,14 +17,21 @@ jobs:
       - name: Install dependancies
         run: |
           sudo apt-get update
-          sudo apt-get install build-essential git make \
+          sudo apt-get install -y build-essential git make \
             pkg-config cmake ninja-build gnome-desktop-testing libasound2-dev libpulse-dev \
             libaudio-dev libfribidi-dev libjack-dev libsndio-dev libx11-dev libxext-dev \
             libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxtst-dev \
             libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
             libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev libpipewire-0.3-dev \
             libwayland-dev libdecor-0-dev liburing-dev libfreetype6-dev libharfbuzz-dev \
-            libjpeg-dev libpng-dev libtiff-dev libwebp-dev
+            libjpeg-dev libpng-dev libtiff-dev libwebp-dev libncurses5-dev libncursesw5-dev
 
-      - name: Test with make
-        run: make
+      - name: Clone SDL dependencies
+        run: |
+          mkdir -p 3rdParty
+          git clone --depth 1 https://github.com/libsdl-org/SDL.git 3rdParty/SDL
+          git clone --depth 1 https://github.com/libsdl-org/SDL_image.git 3rdParty/SDL_image
+          git clone --depth 1 https://github.com/libsdl-org/SDL_ttf.git 3rdParty/SDL_ttf
+
+      - name: Build project
+        run: make -j$(nproc)
