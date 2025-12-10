@@ -52,46 +52,55 @@ void checkCollisions(Game *game) {
   if (game->playerShootX == -1 || game->playerShootY < 0)
     return;
 
-  const double ALIEN_HITBOX_X = 0.015;  // Largeur de collision
-  const double ALIEN_HITBOX_Y = 0.020;  // Hauteur de collision
-  
+  const double ALIEN_HITBOX_X = 0.015; // Largeur de collision
+  const double ALIEN_HITBOX_Y = 0.020; // Hauteur de collision
+
   const double marginX = 0.078;
   const double startX = 0.039;
-  
+
   for (unsigned i = 0; i < game->nbAlienRows; i++) {
     for (unsigned j = 0; j < game->nbAliens; j++) {
       unsigned k = j + i * game->nbAliens;
-      
+
       // Si l'alien est déjà mort, on passe
       if (game->aliens[k] < 0)
         continue;
-      
-      double alienX = ((1.0 - marginX) / (double)(game->nbAliens)) * j + startX + game->aliensX * marginX;
+
+      double alienX = ((1.0 - marginX) / (double)(game->nbAliens)) * j +
+                      startX + game->aliensX * marginX;
       const double startY = 0.139;
       const double spacingY = 0.069;
       const double moveY = 0.208;
       double alienY = startY + spacingY * i + game->aliensY * moveY;
-      
+
       // Distance entre le tir et l'alien
       double distX = fabs(game->playerShootX - alienX);
       double distY = fabs(game->playerShootY - alienY);
-      
+
       // Vérifier la collision
       if (distX < ALIEN_HITBOX_X && distY < ALIEN_HITBOX_Y) {
         // L'alien est touché !
         int alienType = game->aliens[k] / 2;
         game->aliens[k] = -1; // Il est dead !
-        
+
         // Supprimer le tir
         game->playerShootX = -1;
         game->playerShootY = -1;
-        
+
         // Ajouter des points selon le type d'alien
         switch (alienType) {
-          case 0: game->score += 10; break; // Alien Poulpe 
-          case 1: game->score += 20; break; // Alien Crabe
-          case 2: game->score += 30; break; // Alien Pieuvre
-          default: game->score += 40; break; // Alien Rouge (faire la règle du mod(15))
+        case 0:
+          game->score += 10;
+          break; // Alien Poulpe
+        case 1:
+          game->score += 20;
+          break; // Alien Crabe
+        case 2:
+          game->score += 30;
+          break; // Alien Pieuvre
+        default:
+          game->score += 40;
+          break; // Alien Rouge (faire la règle du mod(15))
         }
         return; // Un tir ne peut toucher qu'un seul alien
       }
@@ -105,10 +114,10 @@ void nextFrame(Game *game) {
   // Player shoot
   if (game->playerShootX != -1 && game->playerShootY >= 0) {
     game->playerShootY -= SHOOT_SPEED;
-    
+
     // Vérifier les collisions à chaque frame
     checkCollisions(game);
-    
+
     if (game->playerShootY <= 0) {
       game->playerShootY = -1;
       game->playerShootX = -1;
@@ -133,6 +142,10 @@ void nextFrame(Game *game) {
       game->alienMovement = -game->alienMovement;
       game->aliensX += game->alienMovement;
       game->aliensY += ALIEN_SPEED_Y;
+      if (game->aliensY > 1) {
+        game->aliensY -= ALIEN_SPEED_Y;
+        game->alienMovement = 0;
+      }
     }
   }
 }

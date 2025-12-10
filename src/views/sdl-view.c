@@ -237,6 +237,11 @@ void updateGameSdl(Controller *controller) {
     sprintf(lives, "Lives: %d", game->lives);
     renderText(lives, width - 20, 30, white, RIGHT);
 
+    // Header border
+    SDL_FRect headerBorderRect = {0, (float)(height) * 0.1 - 10, width, 2};
+    SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
+    SDL_RenderFillRect(rend, &headerBorderRect);
+
     // Player
     float playerSizeX = 13 * scale;
     float playerSizeY = 8 * scale;
@@ -260,11 +265,11 @@ void updateGameSdl(Controller *controller) {
       for (unsigned j = 0; j < game->nbAliens; j++) {
         unsigned k = j + i * game->nbAliens;
         int alienIndex = game->aliens[k];
-        
+
         // Ne pas afficher les aliens morts
         if (alienIndex < 0)
           continue;
-        
+
         SDL_Texture *alienTexture = aliensTextures[alienIndex / 2][0];
 
         float alienSizeX, alienSizeY;
@@ -273,7 +278,10 @@ void updateGameSdl(Controller *controller) {
 
         double alienX = ((width - 100) / (double)(game->nbAliens)) * j + 50 +
                         game->aliensX * 100;
-        double alienY = 100 + 50 * i + game->aliensY * 150;
+        double alienY =
+            ((height * 0.65 * 0.6) / (double)(game->nbAlienRows)) * (i + 0.5) +
+            height * 0.1 +
+            game->aliensY * ((height * 1.35) / (double)(game->nbAlienRows));
 
         SDL_FRect alienRect = {alienX - alienSizeX / 2, alienY - alienSizeY / 2,
                                alienSizeX, alienSizeY};
