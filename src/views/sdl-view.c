@@ -238,7 +238,8 @@ void updateGameSdl(Controller *controller) {
     renderText(lives, width - 20, 30, white, RIGHT);
 
     // Header border
-    SDL_FRect headerBorderRect = {0, (float)(height) * 0.1 - 10, width, 2};
+    SDL_FRect headerBorderRect = {0, (float)(height) * HEADER_HEIGHT_RATIO - 10,
+                                  width, 2};
     SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
     SDL_RenderFillRect(rend, &headerBorderRect);
 
@@ -247,13 +248,12 @@ void updateGameSdl(Controller *controller) {
     float playerSizeY = 8 * scale;
     float playerX = game->playerPosition * (width - playerSizeX * 2) +
                     (float)(playerSizeX) / 2;
-    SDL_FRect playerRect = {playerX, height - playerSizeY - 20, playerSizeX,
+    SDL_FRect playerRect = {playerX, height * 0.975 - playerSizeY, playerSizeX,
                             playerSizeY};
     SDL_RenderTexture(rend, playerTexture, NULL, &playerRect);
 
     // Player shoot
-    double shootY = game->playerShootY * (height - (20 + playerSizeY) * 2) +
-                    20 + playerSizeY / 2;
+    double shootY = game->playerShootY * height - 2 * scale;
     SDL_FRect shootRect = {game->playerShootX * (width - playerSizeX * 2) +
                                playerSizeX - scale / 2,
                            shootY, scale, 4 * scale};
@@ -261,6 +261,11 @@ void updateGameSdl(Controller *controller) {
     SDL_RenderFillRect(rend, &shootRect);
 
     // Aliens
+    const double gridHeight =
+        height * ALIENS_HEIGHT_RATIO * ALIENS_GRID_HEIGHT_RATIO;
+    const double moveRangeY =
+        height * ALIENS_HEIGHT_RATIO * (1.0 - ALIENS_GRID_HEIGHT_RATIO);
+
     for (unsigned i = 0; i < game->nbAlienRows; i++) {
       for (unsigned j = 0; j < game->nbAliens; j++) {
         unsigned k = j + i * game->nbAliens;
@@ -276,12 +281,14 @@ void updateGameSdl(Controller *controller) {
         SDL_GetTextureSize(alienTexture, &alienSizeX, &alienSizeY);
         alienSizeX *= scale, alienSizeY *= scale;
 
-        double alienX = ((width - 100) / (double)(game->nbAliens)) * j + 50 +
-                        game->aliensX * 100;
+        double alienX =
+            ((width * GAME_WIDTH_RATIO) / (double)(game->nbAliens)) *
+                (j + 0.5) +
+            game->aliensX *
+                ((width * ALIENS_SWAY_FACTOR) / (double)(game->nbAliens));
         double alienY =
-            ((height * 0.65 * 0.6) / (double)(game->nbAlienRows)) * (i + 0.5) +
-            height * 0.1 +
-            game->aliensY * ((height * 1.35) / (double)(game->nbAlienRows));
+            (gridHeight / (double)(game->nbAlienRows)) * (i + 0.5) +
+            height * HEADER_HEIGHT_RATIO + game->aliensY * moveRangeY;
 
         SDL_FRect alienRect = {alienX - alienSizeX / 2, alienY - alienSizeY / 2,
                                alienSizeX, alienSizeY};

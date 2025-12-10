@@ -37,6 +37,66 @@
 #define ALIEN_SPEED_Y 0.1
 
 /**
+ * @def HEADER_HEIGHT_RATIO
+ * @brief The ratio of the screen height taken by the header (score and lives)
+ */
+#define HEADER_HEIGHT_RATIO 0.1
+
+/**
+ * @def PLAYER_HEIGHT_RATIO
+ * @brief The ratio of the screen height taken by the player
+ */
+#define PLAYER_HEIGHT_RATIO 0.1
+
+/**
+ * @def SHIELD_HEIGHT_RATIO
+ * @brief The ratio of the screen height taken by the shields
+ */
+#define SHIELD_HEIGHT_RATIO 0.15
+
+/**
+ * @def ALIENS_HEIGHT_RATIO
+ * @brief The ratio of the screen height taken by the aliens
+ */
+#define ALIENS_HEIGHT_RATIO 0.65
+
+/**
+ * @def ALIENS_GRID_HEIGHT_RATIO
+ * @brief The ratio of the aliens height taken by the grid
+ */
+#define ALIENS_GRID_HEIGHT_RATIO 0.6
+
+/**
+ * @def GAME_WIDTH_RATIO
+ * @brief The ratio of the screen width taken by the game
+ */
+#define GAME_WIDTH_RATIO 0.9
+
+/**
+ * @def ALIENS_SWAY_FACTOR
+ * @brief The factor for aliens horizontal movement
+ */
+#define ALIENS_SWAY_FACTOR 1.1
+
+/**
+ * @def ALIEN_HITBOX_WIDTH_RATIO
+ * @brief The ratio of the alien width compared to its cell
+ */
+#define ALIEN_HITBOX_WIDTH_RATIO 0.6
+
+/**
+ * @def ALIEN_HITBOX_HEIGHT_RATIO
+ * @brief The ratio of the alien height compared to its cell
+ */
+#define ALIEN_HITBOX_HEIGHT_RATIO 0.5
+
+/**
+ * @def PLAYER_SHOOT_START_Y
+ * @brief The initial Y position of the player's shoot
+ */
+#define PLAYER_SHOOT_START_Y 0.925
+
+/**
  * @struct Game
  * @brief The structure of a game, including all the informations
  */
