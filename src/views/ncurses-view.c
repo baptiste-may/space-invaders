@@ -67,17 +67,64 @@ void updateGameNcurses(Controller *controller) {
     Game *game = controller->model->currentGame;
 
     // Score and lives
-    mvwprintw(gameWin, 2, 2, "Score: %d", game->score);
-    mvwprintw(gameWin, 2, maxWidth - 10, "Lives: %d", game->lives);
+    mvwprintw(gameWin, 1, 2, "Score: %d", game->score);
+    mvwprintw(gameWin, 1, maxWidth - 10, "Lives: %d", game->lives);
 
     // Player
     int playerPosition = game->playerPosition * (maxWidth - 7) + 3;
     mvwprintw(gameWin, maxHeight - 3, playerPosition - 1, "/ \\");
     mvwprintw(gameWin, maxHeight - 2, playerPosition - 2, "[___]");
 
+    // Aliens
+    double gridHeight =
+        maxHeight * ALIENS_HEIGHT_RATIO * ALIENS_GRID_HEIGHT_RATIO;
+    double moveRangeY =
+        maxHeight * ALIENS_HEIGHT_RATIO * (1.0 - ALIENS_GRID_HEIGHT_RATIO);
+
+    for (unsigned i = 0; i < game->nbAlienRows; i++) {
+      for (unsigned j = 0; j < game->nbAliens; j++) {
+        unsigned k = j + i * game->nbAliens;
+        int alienIndex = game->aliens[k];
+
+        // Do not display dead aliens
+        if (alienIndex < 0)
+          continue;
+
+        int alienX = (int)(
+            ((maxWidth * GAME_WIDTH_RATIO) / (double)(game->nbAliens)) *
+                (j + 0.5) +
+            game->aliensX *
+                ((maxWidth * ALIENS_SWAY_FACTOR) / (double)(game->nbAliens)));
+        int alienY = (int)(
+            (gridHeight / (double)(game->nbAlienRows)) * (i + 0.5) +
+            maxHeight * HEADER_HEIGHT_RATIO + game->aliensY * moveRangeY);
+
+        switch (alienIndex) {
+          case 0:
+          case 1:
+            mvwprintw(gameWin, alienY - 1, alienX - 2, " _^_");
+            mvwprintw(gameWin, alienY, alienX - 2, "(- -)");
+            mvwprintw(gameWin, alienY + 1, alienX - 2, " %c %c", alienIndex == 0 ? '/' : '\\', alienIndex == 0 ? '\\' : '/');
+            break;
+          case 2:
+          case 3:
+            mvwprintw(gameWin, alienY - 1, alienX - 2, "%1$c\\_/%1$c", alienIndex == 2 ? '|' : ' ');
+            mvwprintw(gameWin, alienY, alienX - 2, "%co_o%c", alienIndex == 2 ? '\\' : '/', alienIndex == 2 ? '/' : '\\');
+            mvwprintw(gameWin, alienY + 1, alienX - 2, "%1$c%2$c %3$c%1$c", alienIndex == 2 ? ' ' : '|', alienIndex == 2 ? '/' : '\\', alienIndex == 2 ? '\\' : '/');
+            break;
+          case 4:
+          case 5:
+            mvwprintw(gameWin, alienY - 1, alienX - 1, " ^");
+            mvwprintw(gameWin, alienY, alienX - 1, "/_\\");
+            mvwprintw(gameWin, alienY + 1, alienX - 1, "%c %c", alienIndex == 4 ? '/' : '\\', alienIndex == 4 ? '\\' : '/');
+            break;
+        }
+      }
+    }
+
     // Player shoot
     int playerShootX = game->playerShootX * (maxWidth - 7) + 3;
-    int playerShootY = game->playerShootY * (maxHeight - 4) + 2;
+    int playerShootY = game->playerShootY * maxHeight - 1;
     mvwprintw(gameWin, playerShootY, playerShootX, "|");
   }
 
