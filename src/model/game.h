@@ -97,6 +97,36 @@
 #define PLAYER_SHOOT_START_Y 0.925
 
 /**
+ * @def PLAYER_HITBOX_WIDTH
+ * @brief The width of the player hitbox
+ */
+#define PLAYER_HITBOX_WIDTH 0.04
+
+/**
+ * @def PLAYER_HITBOX_HEIGHT
+ * @brief The height of the player hitbox
+ */
+#define PLAYER_HITBOX_HEIGHT 0.06
+
+/**
+ * @def MAX_ALIEN_SHOTS
+ * @brief Maximum number of simultaneous alien shots
+ */
+#define MAX_ALIEN_SHOTS 10
+
+/**
+ * @def ALIEN_SHOOT_PROBABILITY
+ * @brief Probability that an alien shoots per tick
+ */
+#define ALIEN_SHOOT_PROBABILITY 0.05
+
+/**
+ * @def ALIEN_SHOOT_SPEED
+ * @brief The alien shoot speed
+ */
+#define ALIEN_SHOOT_SPEED 0.008
+
+/**
  * @struct Game
  * @brief The structure of a game, including all the informations
  */
@@ -107,19 +137,23 @@ typedef struct {
   unsigned nbAlienRows; //!< The number of alien rows
   unsigned nbBuildings; //!< The number of buildings between the aliens and the
                         //!< player
-
+  
   unsigned frame;    //!< The current frame of the game (for timing, from 0 to
                      //!< frameMax)
   unsigned frameMax; //!< The max number of frame
-
+  
   int *aliens; //!< The grid of aliens where each number is a variety of alien
   double aliensX;       //!< The x coords of the most top left alien
   double aliensY;       //!< The y coords of the most top left alien
   double alienMovement; //!< The movement of the aliens
-
+  
   double playerPosition; //!< The player position in pourcentage
   double playerShootX;   //!< The x coords of the player shoot
   double playerShootY;   //!< The y coords of the player shoot
+  double alienShotX[MAX_ALIEN_SHOTS];   //!< The x coords of alien shots
+  double alienShotY[MAX_ALIEN_SHOTS];   //!< The y coords of alien shots
+  int alienShotActive[MAX_ALIEN_SHOTS]; //!< Whether each alien shot is active
+  int gameOver; //!< Game over flag (0 = playing, 1 = game over)
 } Game;
 
 /**

@@ -253,12 +253,26 @@ void updateGameSdl(Controller *controller) {
     SDL_RenderTexture(rend, playerTexture, NULL, &playerRect);
 
     // Player shoot
-    double shootY = game->playerShootY * height - 2 * scale;
-    SDL_FRect shootRect = {game->playerShootX * (width - playerSizeX * 2) +
-                               playerSizeX - scale / 2,
-                           shootY, scale, 4 * scale};
-    SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
-    SDL_RenderFillRect(rend, &shootRect);
+    if (game->playerShootX >= 0 && game->playerShootY >= 0) {
+      double shootY = game->playerShootY * height - 2 * scale;
+      SDL_FRect shootRect = {game->playerShootX * (width - playerSizeX * 2) +
+                                 playerSizeX - scale / 2,
+                             shootY, scale, 4 * scale};
+      SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+      SDL_RenderFillRect(rend, &shootRect);
+    }
+
+    // Alien shots
+    for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
+      if (game->alienShotActive[i]) {
+        double alienShootX = game->alienShotX[i] * (width - playerSizeX * 2) + 
+                             playerSizeX - scale / 2;
+        double alienShootY = game->alienShotY[i] * height - 2 * scale;
+        SDL_FRect alienShootRect = {alienShootX, alienShootY, scale, 4 * scale};
+        SDL_SetRenderDrawColor(rend, 255, 0, 0, 255); // Rouge pour les tirs aliens
+        SDL_RenderFillRect(rend, &alienShootRect);
+      }
+    }
 
     // Aliens
     const double gridHeight =

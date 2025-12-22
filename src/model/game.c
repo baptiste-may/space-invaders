@@ -2,9 +2,12 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
               unsigned int nbBuildings) {
+  srand(time(NULL));
+  
   // Creating game
   Game *res = (Game *)malloc(sizeof(Game));
   if (res == NULL) {
@@ -24,7 +27,11 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
                 ALIEN_SPEED_X,
                 0.5,
                 -1,
-                -1};
+                -1,
+                {0},
+                {0},
+                {0},
+                0};
 
   // Building aliens
   res->aliens = (int *)calloc(sizeof(int), nbAlienRows * nbAliens);
@@ -37,6 +44,12 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
     for (unsigned j = 0; j < nbAliens; j++) {
       res->aliens[i * nbAliens + j] = i == 0 ? 5 : i <= 2 ? 3 : 1;
     }
+  }
+
+  for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
+    res->alienShotActive[i] = 0;
+    res->alienShotX[i] = -1;
+    res->alienShotY[i] = -1;
   }
 
   return res;
@@ -98,6 +111,81 @@ void checkCollisions(Game *game) {
   }
 }
 
+void checkPlayerHit(Game *game) {
+  if (game->gameOver)
+    return;
+    
+  const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
+  const double playerX = game->playerPosition * GAME_WIDTH_RATIO + margin;
+  const double playerY = 1.0 - PLAYER_HEIGHT_RATIO / 2.0;
+  
+  const double halfHitW = PLAYER_HITBOX_WIDTH / 2.0;
+  const double halfHitH = PLAYER_HITBOX_HEIGHT / 2.0;
+
+  for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
+    if (!game->alienShotActive[i])
+      continue;
+
+    const double shotX = game->alienShotX[i] * GAME_WIDTH_RATIO + margin;
+    const double shotY = game->alienShotY[i];
+
+    if (fabs(shotX - playerX) < halfHitW && fabs(shotY - playerY) < halfHitH) {
+      game->alienShotActive[i] = 0;
+      game->alienShotX[i] = -1;
+      game->alienShotY[i] = -1;
+      
+      if (game->lives > 0) {
+        game->lives--;
+      }
+      
+      if (game->lives == 0) {
+        game->gameOver = 1;
+        exit(EXIT_SUCCESS);
+      }
+      
+      return;
+    }
+  }
+}
+
+void alienShoot(Game *game) {
+  const double gridHeight = ALIENS_HEIGHT_RATIO * ALIENS_GRID_HEIGHT_RATIO;
+  const double moveRangeY =
+      ALIENS_HEIGHT_RATIO * (1.0 - ALIENS_GRID_HEIGHT_RATIO);
+  const double alienStepX = GAME_WIDTH_RATIO / game->nbAliens;
+  const double alienBaseX = (GAME_WIDTH_RATIO * 0.5) / game->nbAliens +
+                            game->aliensX *
+                                (ALIENS_SWAY_FACTOR / game->nbAliens);
+  const double rowHeight = gridHeight / game->nbAlienRows;
+  const double alienBaseY = HEADER_HEIGHT_RATIO + game->aliensY * moveRangeY;
+
+  for (unsigned i = 0; i < game->nbAlienRows; i++) {
+    for (unsigned j = 0; j < game->nbAliens; j++) {
+      unsigned k = j + i * game->nbAliens;
+      
+      if (game->aliens[k] < 0)
+        continue;
+
+      double randVal = (double)rand() / RAND_MAX;
+      if (randVal < ALIEN_SHOOT_PROBABILITY) {
+        for (int s = 0; s < MAX_ALIEN_SHOTS; s++) {
+          if (!game->alienShotActive[s]) {
+            double alienX = alienStepX * j + alienBaseX;
+            double alienY = rowHeight * (i + 0.5) + alienBaseY;
+            
+            const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
+            game->alienShotX[s] = (alienX - margin) / GAME_WIDTH_RATIO;
+            game->alienShotY[s] = alienY;
+            game->alienShotActive[s] = 1;
+            
+            break;
+          }
+        }
+      }
+    }
+  }
+}
+
 void nextFrame(Game *game) {
   game->frame = (game->frame + 1) % game->frameMax;
 
@@ -113,6 +201,21 @@ void nextFrame(Game *game) {
       game->playerShootX = -1;
     }
   }
+
+  // Alien shots
+  for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
+    if (game->alienShotActive[i]) {
+      game->alienShotY[i] += ALIEN_SHOOT_SPEED;
+      
+      if (game->alienShotY[i] > 1.0) {
+        game->alienShotActive[i] = 0;
+        game->alienShotX[i] = -1;
+        game->alienShotY[i] = -1;
+      }
+    }
+  }
+
+  checkPlayerHit(game);
 
   // Next tick
   if (game->frame == 0) {
@@ -135,8 +238,11 @@ void nextFrame(Game *game) {
       if (game->aliensY > 1) {
         game->aliensY -= ALIEN_SPEED_Y;
         game->alienMovement = 0;
+        game->gameOver = 1;
       }
     }
+
+    alienShoot(game);
   }
 }
 
