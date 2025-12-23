@@ -55,8 +55,6 @@ typedef struct {
   double shootY;        //!< The y coords of the player shoot
 } Player;
 
-struct Aliens;
-
 /**
  * @brief Create player structure
  *
