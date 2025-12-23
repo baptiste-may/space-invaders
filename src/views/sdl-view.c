@@ -234,7 +234,7 @@ void updateGameSdl(Controller *controller) {
 
     // Lives
     char lives[20];
-    sprintf(lives, "Lives: %d", game->lives);
+    sprintf(lives, "Lives: %d", game->player->lives);
     renderText(lives, width - 20, 30, white, RIGHT);
 
     // Header border
@@ -246,16 +246,16 @@ void updateGameSdl(Controller *controller) {
     // Player
     float playerSizeX = 13 * scale;
     float playerSizeY = 8 * scale;
-    float playerX = game->playerPosition * (width - playerSizeX * 2) +
+    float playerX = game->player->position * (width - playerSizeX * 2) +
                     (float)(playerSizeX) / 2;
     SDL_FRect playerRect = {playerX, height * 0.975 - playerSizeY, playerSizeX,
                             playerSizeY};
     SDL_RenderTexture(rend, playerTexture, NULL, &playerRect);
 
     // Player shoot
-    if (game->playerShootX >= 0 && game->playerShootY >= 0) {
-      double shootY = game->playerShootY * height - 2 * scale;
-      SDL_FRect shootRect = {game->playerShootX * (width - playerSizeX * 2) +
+    if (game->player->shootX >= 0 && game->player->shootY >= 0) {
+      double shootY = game->player->shootY * height - 2 * scale;
+      SDL_FRect shootRect = {game->player->shootX * (width - playerSizeX * 2) +
                                  playerSizeX - scale / 2,
                              shootY, scale, 4 * scale};
       SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
@@ -265,7 +265,7 @@ void updateGameSdl(Controller *controller) {
     // Alien shots
     for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
       if (game->aliens->alienShotActive[i]) {
-        double alienShootX = game->aliens->alienShotX[i] * (width - playerSizeX * 2) + 
+        double alienShootX = game->aliens->alienShotX[i] * (width - playerSizeX * 2) +
                              playerSizeX - scale / 2;
         double alienShootY = game->aliens->alienShotY[i] * height - 2 * scale;
         SDL_FRect alienShootRect = {alienShootX, alienShootY, scale, 4 * scale};

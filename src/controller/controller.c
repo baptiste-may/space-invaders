@@ -71,13 +71,13 @@ void mainLoop(Controller *controller) {
         mainMenu->isOpen = true;
         break;
       case EVENT_KEY_LEFT:
-        movePlayerLeft(game);
+        playerMoveLeft(game->player);
         break;
       case EVENT_KEY_RIGHT:
-        movePlayerRight(game);
+        playerMoveRight(game->player);
         break;
       case EVENT_KEY_SPACE:
-        playerShoot(game);
+        playerFire(game->player);
         break;
       default:
         break;

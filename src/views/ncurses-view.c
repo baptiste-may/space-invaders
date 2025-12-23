@@ -68,10 +68,10 @@ void updateGameNcurses(Controller *controller) {
 
     // Score and lives
     mvwprintw(gameWin, 1, 2, "Score: %d", game->score);
-    mvwprintw(gameWin, 1, maxWidth - 10, "Lives: %d", game->lives);
+    mvwprintw(gameWin, 1, maxWidth - 10, "Lives: %d", game->player->lives);
 
     // Player
-    int playerPosition = game->playerPosition * (maxWidth - 7) + 3;
+    int playerPosition = game->player->position * (maxWidth - 7) + 3;
     mvwprintw(gameWin, maxHeight - 3, playerPosition - 1, "/ \\");
     mvwprintw(gameWin, maxHeight - 2, playerPosition - 2, "[___]");
 
@@ -123,8 +123,8 @@ void updateGameNcurses(Controller *controller) {
     }
 
     // Player shoot
-    int playerShootX = game->playerShootX * (maxWidth - 7) + 3;
-    int playerShootY = game->playerShootY * maxHeight - 1;
+    int playerShootX = game->player->shootX * (maxWidth - 7) + 3;
+    int playerShootY = game->player->shootY * maxHeight - 1;
     mvwprintw(gameWin, playerShootY, playerShootX, "|");
   }
 

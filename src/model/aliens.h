@@ -121,3 +121,13 @@ void updateAlienShots(Aliens *aliens);
  * @param aliens The aliens structure
  */
 void animateAliens(Aliens *aliens);
+
+/**
+ * @brief Check if a shot hits an alien and handle the destruction
+ * 
+ * @param aliens The aliens structure
+ * @param shotX The x coordinate of the shot (normalized 0-1)
+ * @param shotY The y coordinate of the shot (normalized 0-1)
+ * @return The points earned (0 if no hit)
+ */
+int resolveAlienHit(Aliens *aliens, double shotX, double shotY);
