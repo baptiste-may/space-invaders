@@ -65,8 +65,9 @@ void alienShoot(Aliens *aliens) {
   const double moveRangeY =
       ALIENS_HEIGHT_RATIO * (1.0 - ALIENS_GRID_HEIGHT_RATIO);
   const double alienStepX = GAME_WIDTH_RATIO / aliens->nbAliens;
-  const double alienBaseX = (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
-                            aliens->aliensX *
+  const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
+  const double alienBaseX = margin + (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
+                            (aliens->aliensX - 0.5) *
                                 (ALIENS_SWAY_FACTOR / aliens->nbAliens);
   const double rowHeight = gridHeight / aliens->nbAlienRows;
   const double alienBaseY = HEADER_HEIGHT_RATIO + aliens->aliensY * moveRangeY;
@@ -85,7 +86,6 @@ void alienShoot(Aliens *aliens) {
             double alienX = alienStepX * j + alienBaseX;
             double alienY = rowHeight * (i + 0.5) + alienBaseY;
             
-            const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
             aliens->alienShotX[s] = (alienX - margin) / GAME_WIDTH_RATIO;
             aliens->alienShotY[s] = alienY;
             aliens->alienShotActive[s] = true;
@@ -141,8 +141,8 @@ int resolveAlienHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
       (ALIEN_HITBOX_HEIGHT_RATIO * gridHeight) / aliens->nbAlienRows / 2.0;
 
   const double alienStepX = GAME_WIDTH_RATIO / aliens->nbAliens;
-  const double alienBaseX = (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
-                            aliens->aliensX *
+  const double alienBaseX = margin + (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
+                            (aliens->aliensX - 0.5) *
                                 (ALIENS_SWAY_FACTOR / aliens->nbAliens);
 
   const double rowHeight = gridHeight / aliens->nbAlienRows;

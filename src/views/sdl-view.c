@@ -246,8 +246,11 @@ void updateGameSdl(Controller *controller) {
     // Player
     float playerSizeX = 13 * scale;
     float playerSizeY = 8 * scale;
-    float playerX = game->player->position * (width - playerSizeX * 2) +
-                    (float)(playerSizeX) / 2;
+    // Align visual player position with logical position (including margin)
+    float playerX = (game->player->position * GAME_WIDTH_RATIO +
+                     (1.0 - GAME_WIDTH_RATIO) / 2.0) *
+                        width -
+                    playerSizeX / 2;
     SDL_FRect playerRect = {playerX, height * 0.975 - playerSizeY, playerSizeX,
                             playerSizeY};
     SDL_RenderTexture(rend, playerTexture, NULL, &playerRect);
@@ -257,6 +260,7 @@ void updateGameSdl(Controller *controller) {
         height * ALIENS_HEIGHT_RATIO * ALIENS_GRID_HEIGHT_RATIO;
     const double moveRangeY =
         height * ALIENS_HEIGHT_RATIO * (1.0 - ALIENS_GRID_HEIGHT_RATIO);
+    const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
 
     for (unsigned i = 0; i < game->aliens->nbAlienRows; i++) {
       for (unsigned j = 0; j < game->aliens->nbAliens; j++) {
@@ -274,10 +278,12 @@ void updateGameSdl(Controller *controller) {
         alienSizeX *= scale, alienSizeY *= scale;
 
         double alienX =
+            margin * width +
             ((width * GAME_WIDTH_RATIO) / (double)(game->aliens->nbAliens)) *
                 (j + 0.5) +
-            game->aliens->aliensX *
-                ((width * ALIENS_SWAY_FACTOR) / (double)(game->aliens->nbAliens));
+            (game->aliens->aliensX - 0.5) *
+                ((width * ALIENS_SWAY_FACTOR) /
+                 (double)(game->aliens->nbAliens));
         double alienY =
             (gridHeight / (double)(game->aliens->nbAlienRows)) * (i + 0.5) +
             height * HEADER_HEIGHT_RATIO + game->aliens->aliensY * moveRangeY;
@@ -292,9 +298,11 @@ void updateGameSdl(Controller *controller) {
     // Player shoot
     if (game->player->shootX >= 0 && game->player->shootY >= 0) {
       double shootY = game->player->shootY * height - 2 * scale;
-      SDL_FRect shootRect = {game->player->shootX * (width - playerSizeX * 2) +
-                                 playerSizeX - scale / 2,
-                             shootY, scale, 4 * scale};
+      // Align visual shoot position with logical position
+      SDL_FRect shootRect = {
+          (game->player->shootX * GAME_WIDTH_RATIO + margin) * width -
+              scale / 2,
+          shootY, scale, 4 * scale};
       SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
       SDL_RenderFillRect(rend, &shootRect);
     }
@@ -302,11 +310,14 @@ void updateGameSdl(Controller *controller) {
     // Alien shots
     for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
       if (game->aliens->alienShotActive[i]) {
-        double alienShootX = game->aliens->alienShotX[i] * (width - playerSizeX * 2) +
-                             playerSizeX - scale / 2;
+        // Align visual alien shoot position with logical position
+        double alienShootX =
+            (game->aliens->alienShotX[i] * GAME_WIDTH_RATIO + margin) * width -
+            scale / 2;
         double alienShootY = game->aliens->alienShotY[i] * height - 2 * scale;
         SDL_FRect alienShootRect = {alienShootX, alienShootY, scale, 4 * scale};
-        SDL_SetRenderDrawColor(rend, 255, 0, 0, 255); // Rouge pour les tirs aliens
+        SDL_SetRenderDrawColor(rend, 255, 0, 0,
+                               255); // Rouge pour les tirs aliens
         SDL_RenderFillRect(rend, &alienShootRect);
       }
     }
