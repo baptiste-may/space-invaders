@@ -72,9 +72,9 @@ typedef struct {
   double aliensY;       //!< The y coords of the most top left alien
   double alienMovement; //!< The movement of the aliens
   
-  double alienShotX[MAX_ALIEN_SHOTS];   //!< The x coords of alien shots
-  double alienShotY[MAX_ALIEN_SHOTS];   //!< The y coords of alien shots
-  int alienShotActive[MAX_ALIEN_SHOTS]; //!< Whether each alien shot is active
+  double alienShotX[MAX_ALIEN_SHOTS];    //!< The x coords of alien shots
+  double alienShotY[MAX_ALIEN_SHOTS];    //!< The y coords of alien shots
+  bool alienShotActive[MAX_ALIEN_SHOTS]; //!< Whether each alien shot is active
 } Aliens;
 
 /**
@@ -97,9 +97,9 @@ void freeAliens(Aliens *aliens);
  * @brief Move the aliens
  *
  * @param aliens The aliens structure
- * @return 1 if game over (aliens reached bottom), 0 otherwise
+ * @return if game over (aliens reached bottom)
  */
-int moveAliens(Aliens *aliens);
+bool moveAliens(Aliens *aliens);
 
 /**
  * @brief Make aliens shoot randomly

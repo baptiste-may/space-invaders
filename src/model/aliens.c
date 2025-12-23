@@ -30,7 +30,7 @@ Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows) {
   }
 
   for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
-    res->alienShotActive[i] = 0;
+    res->alienShotActive[i] = false;
     res->alienShotX[i] = -1;
     res->alienShotY[i] = -1;
   }
@@ -45,7 +45,7 @@ void freeAliens(Aliens *aliens) {
   }
 }
 
-int moveAliens(Aliens *aliens) {
+bool moveAliens(Aliens *aliens) {
     aliens->aliensX += aliens->alienMovement;
     if (aliens->aliensX < 0 || aliens->aliensX > 1) {
       aliens->alienMovement = -aliens->alienMovement;
@@ -54,10 +54,10 @@ int moveAliens(Aliens *aliens) {
       if (aliens->aliensY > 1) {
         aliens->aliensY -= ALIEN_SPEED_Y;
         aliens->alienMovement = 0;
-        return 1; // Game Over
+        return true; // Game Over
       }
     }
-    return 0;
+    return false;
 }
 
 void alienShoot(Aliens *aliens) {
@@ -88,7 +88,7 @@ void alienShoot(Aliens *aliens) {
             const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
             aliens->alienShotX[s] = (alienX - margin) / GAME_WIDTH_RATIO;
             aliens->alienShotY[s] = alienY;
-            aliens->alienShotActive[s] = 1;
+            aliens->alienShotActive[s] = true;
             
             break;
           }
@@ -104,7 +104,7 @@ void updateAlienShots(Aliens *aliens) {
       aliens->alienShotY[i] += ALIEN_SHOOT_SPEED;
       
       if (aliens->alienShotY[i] > 1.0) {
-        aliens->alienShotActive[i] = 0;
+        aliens->alienShotActive[i] = false;
         aliens->alienShotX[i] = -1;
         aliens->alienShotY[i] = -1;
       }
