@@ -81,23 +81,23 @@ void updateGameNcurses(Controller *controller) {
     double moveRangeY =
         maxHeight * ALIENS_HEIGHT_RATIO * (1.0 - ALIENS_GRID_HEIGHT_RATIO);
 
-    for (unsigned i = 0; i < game->nbAlienRows; i++) {
-      for (unsigned j = 0; j < game->nbAliens; j++) {
-        unsigned k = j + i * game->nbAliens;
-        int alienIndex = game->aliens[k];
+    for (unsigned i = 0; i < game->aliens->nbAlienRows; i++) {
+      for (unsigned j = 0; j < game->aliens->nbAliens; j++) {
+        unsigned k = j + i * game->aliens->nbAliens;
+        int alienIndex = game->aliens->aliens[k];
 
         // Do not display dead aliens
         if (alienIndex < 0)
           continue;
 
         int alienX = (int)(
-            ((maxWidth * GAME_WIDTH_RATIO) / (double)(game->nbAliens)) *
+            ((maxWidth * GAME_WIDTH_RATIO) / (double)(game->aliens->nbAliens)) *
                 (j + 0.5) +
-            game->aliensX *
-                ((maxWidth * ALIENS_SWAY_FACTOR) / (double)(game->nbAliens)));
+            game->aliens->aliensX *
+                ((maxWidth * ALIENS_SWAY_FACTOR) / (double)(game->aliens->nbAliens)));
         int alienY = (int)(
-            (gridHeight / (double)(game->nbAlienRows)) * (i + 0.5) +
-            maxHeight * HEADER_HEIGHT_RATIO + game->aliensY * moveRangeY);
+            (gridHeight / (double)(game->aliens->nbAlienRows)) * (i + 0.5) +
+            maxHeight * HEADER_HEIGHT_RATIO + game->aliens->aliensY * moveRangeY);
 
         switch (alienIndex) {
           case 0:
