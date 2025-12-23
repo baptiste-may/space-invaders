@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <math.h>
 
+static const int UFO_POINTS[] = {100, 50, 50, 100, 150, 100, 100, 50, 
+                                  300, 100, 100, 100, 50, 150, 100, 50};
+
 Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows) {
   Aliens *res = (Aliens *)malloc(sizeof(Aliens));
   if (res == NULL) {
@@ -34,6 +37,12 @@ Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows) {
     res->alienShotX[i] = -1;
     res->alienShotY[i] = -1;
   }
+  
+  // UFO initialization
+  res->ufoActive = false;
+  res->ufoX = -1;
+  res->ufoDirection = 1;
+  res->shotCounter = 0;
   
   return res;
 }
@@ -70,7 +79,8 @@ void alienShoot(Aliens *aliens) {
                             (aliens->aliensX - 0.5) *
                                 (ALIENS_SWAY_FACTOR / aliens->nbAliens);
   const double rowHeight = gridHeight / aliens->nbAlienRows;
-  const double alienBaseY = HEADER_HEIGHT_RATIO + aliens->aliensY * moveRangeY;
+  // CORRECTION: Les aliens commencent après l'UFO (UFO_HEIGHT_RATIO + petit espace)
+  const double alienBaseY = UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
 
   for (unsigned i = 0; i < aliens->nbAlienRows; i++) {
     for (unsigned j = 0; j < aliens->nbAliens; j++) {
@@ -123,8 +133,56 @@ void animateAliens(Aliens *aliens) {
     }
 }
 
+void updateUFO(Aliens *aliens) {
+  if (aliens->ufoActive) {
+    aliens->ufoX += aliens->ufoDirection * UFO_SPEED;
+    
+    // UFO sort de l'écran
+    if (aliens->ufoX < -0.1 || aliens->ufoX > 1.1) {
+      aliens->ufoActive = false;
+      aliens->ufoX = -1;
+    }
+  } else {
+    // Chance de spawn
+    double randVal = (double)rand() / RAND_MAX;
+    if (randVal < UFO_SPAWN_CHANCE) {
+      aliens->ufoActive = true;
+      // Spawn aléatoire depuis la gauche ou la droite
+      aliens->ufoDirection = (rand() % 2) ? 1 : -1;
+      aliens->ufoX = aliens->ufoDirection == 1 ? -0.05 : 1.05;
+    }
+  }
+}
+
+void incrementShotCounter(Aliens *aliens) {
+  aliens->shotCounter = (aliens->shotCounter + 1) % 15;
+}
+
+int resolveUFOHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
+  if (!aliens->ufoActive || shotX_norm == -1)
+    return 0;
+
+  const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
+  const double shotX = shotX_norm * GAME_WIDTH_RATIO + margin;
+  const double shotY = shotY_norm;
+
+  const double ufoX = aliens->ufoX;
+  const double ufoY = UFO_HEIGHT_RATIO;
+
+  const double halfHitW = 0.04;
+  const double halfHitH = 0.02;
+
+  if (fabs(shotX - ufoX) < halfHitW && fabs(shotY - ufoY) < halfHitH) {
+    aliens->ufoActive = false;
+    aliens->ufoX = -1;
+    return UFO_POINTS[aliens->shotCounter];
+  }
+
+  return 0;
+}
+
 int resolveAlienHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
-  if (shotX_norm == -1 || shotY_norm < HEADER_HEIGHT_RATIO)
+  if (shotX_norm == -1 || shotY_norm < UFO_HEIGHT_RATIO + 0.05)
     return 0;
 
   const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
@@ -146,8 +204,8 @@ int resolveAlienHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
                                 (ALIENS_SWAY_FACTOR / aliens->nbAliens);
 
   const double rowHeight = gridHeight / aliens->nbAlienRows;
-  const double alienBaseY =
-      HEADER_HEIGHT_RATIO + aliens->aliensY * moveRangeY;
+  // SI IL COMMENCE PAS APRES L'UFO AUSSI LES ALIEN ET QUE L'UFO POP DANS LE SCORE NORMAL JE VAIS PAS LE VOIR AUSSI
+  const double alienBaseY = UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
 
   for (unsigned i = 0; i < aliens->nbAlienRows; i++) {
     double alienY = rowHeight * (i + 0.5) + alienBaseY;

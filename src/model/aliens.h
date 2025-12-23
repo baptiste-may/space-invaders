@@ -1,5 +1,4 @@
 #pragma once
-
 #include <stdbool.h>
 
 /**
@@ -18,7 +17,7 @@
  * @def ALIENS_HEIGHT_RATIO
  * @brief The ratio of the screen height taken by the aliens
  */
-#define ALIENS_HEIGHT_RATIO 0.65
+#define ALIENS_HEIGHT_RATIO 0.55
 
 /**
  * @def ALIENS_GRID_HEIGHT_RATIO
@@ -63,6 +62,24 @@
 #define ALIEN_SHOOT_SPEED 0.008
 
 /**
+ * @def UFO_HEIGHT_RATIO
+ * @brief The Y position of the UFO (below header, above aliens)
+ */
+#define UFO_HEIGHT_RATIO 0.12
+
+/**
+ * @def UFO_SPEED
+ * @brief The UFO horizontal speed
+ */
+#define UFO_SPEED 0.0001
+
+/**
+ * @def UFO_SPAWN_CHANCE
+ * @brief Probability that UFO spawns per tick (when not active)
+ */
+#define UFO_SPAWN_CHANCE 0.001
+
+/**
  * @struct Aliens
  * @brief The structure representing the aliens group
  */
@@ -73,10 +90,16 @@ typedef struct {
   double aliensX;       //!< The x coords of the most top left alien
   double aliensY;       //!< The y coords of the most top left alien
   double alienMovement; //!< The movement of the aliens
-  
+
   double alienShotX[MAX_ALIEN_SHOTS];    //!< The x coords of alien shots
   double alienShotY[MAX_ALIEN_SHOTS];    //!< The y coords of alien shots
   bool alienShotActive[MAX_ALIEN_SHOTS]; //!< Whether each alien shot is active
+  
+  // UFO
+  bool ufoActive;       //!< Whether the UFO is currently on screen
+  double ufoX;          //!< The x coordinate of the UFO (0-1)
+  int ufoDirection;     //!< The direction of UFO movement (-1 left, 1 right)
+  unsigned shotCounter; //!< Counter for shots fired (for UFO points calculation)
 } Aliens;
 
 /**
@@ -133,3 +156,27 @@ void animateAliens(Aliens *aliens);
  * @return The points earned (0 if no hit)
  */
 int resolveAlienHit(Aliens *aliens, double shotX, double shotY);
+
+/**
+ * @brief Update UFO position and spawn logic
+ *
+ * @param aliens The aliens structure
+ */
+void updateUFO(Aliens *aliens);
+
+/**
+ * @brief Check if a shot hits the UFO
+ *
+ * @param aliens The aliens structure
+ * @param shotX The x coordinate of the shot (normalized 0-1)
+ * @param shotY The y coordinate of the shot (normalized 0-1)
+ * @return The points earned (0 if no hit)
+ */
+int resolveUFOHit(Aliens *aliens, double shotX, double shotY);
+
+/**
+ * @brief Increment shot counter (called when player shoots)
+ *
+ * @param aliens The aliens structure
+ */
+void incrementShotCounter(Aliens *aliens);

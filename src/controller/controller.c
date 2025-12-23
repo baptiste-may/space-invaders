@@ -77,7 +77,7 @@ void mainLoop(Controller *controller) {
         playerMoveRight(game->player);
         break;
       case EVENT_KEY_SPACE:
-        playerFire(game->player);
+        playerFire(game->player, game->aliens);
         break;
       default:
         break;

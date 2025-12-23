@@ -11,12 +11,10 @@ Player *createPlayer() {
     perror("Allocation error");
     exit(EXIT_FAILURE);
   }
-  
   res->lives = DEFAULT_LIVES;
   res->position = 0.5;
   res->shootX = -1;
   res->shootY = -1;
-  
   return res;
 }
 
@@ -38,11 +36,12 @@ void playerMoveRight(Player *player) {
     player->position = 1;
 }
 
-void playerFire(Player *player) {
+void playerFire(Player *player, Aliens *aliens) {
   if (player->shootX != -1 && player->shootY >= 0)
     return;
   player->shootX = player->position;
   player->shootY = PLAYER_SHOOT_START_Y;
+  incrementShotCounter(aliens);
 }
 
 void updatePlayerShot(Player *player) {
@@ -55,7 +54,7 @@ int resolvePlayerHit(Player *player, Aliens *aliens) {
   const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
   const double playerX = player->position * GAME_WIDTH_RATIO + margin;
   const double playerY = 1.0 - PLAYER_HEIGHT_RATIO / 2.0;
-  
+
   const double halfHitW = PLAYER_HITBOX_WIDTH / 2.0;
   const double halfHitH = PLAYER_HITBOX_HEIGHT / 2.0;
 
@@ -70,12 +69,13 @@ int resolvePlayerHit(Player *player, Aliens *aliens) {
       aliens->alienShotActive[i] = 0;
       aliens->alienShotX[i] = -1;
       aliens->alienShotY[i] = -1;
-      
+
       if (player->lives > 0) {
         player->lives--;
       }
-      
+
       return 1;
+
     }
   }
   return 0;

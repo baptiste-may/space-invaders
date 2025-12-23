@@ -26,6 +26,7 @@ SDL_Renderer *rend = NULL;
 TTF_Font *font = NULL;
 SDL_Texture *playerTexture = NULL;
 SDL_Texture *aliensTextures[4][2];
+SDL_Texture *ufoTexture = NULL;
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color black = {0, 0, 0, 255};
@@ -79,6 +80,15 @@ void initViewSdl(Controller *controller) {
     }
   }
 
+  // Load UFO texture
+  ufoTexture = IMG_LoadTexture(rend, "assets/alien4.png");
+  if (ufoTexture == NULL) {
+    fprintf(stderr, "Cannot load UFO texture: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+  SDL_SetTextureScaleMode(ufoTexture, SDL_SCALEMODE_NEAREST);
+
   if (TTF_Init() == false) {
     fprintf(stderr, "Cannot initialize TTF: %s", SDL_GetError());
     closeViewSdl();
@@ -112,6 +122,8 @@ void closeViewSdl() {
         SDL_DestroyTexture(aliensTextures[i][j]);
     }
   }
+  if (ufoTexture != NULL)
+    SDL_DestroyTexture(ufoTexture);
   if (rend != NULL)
     SDL_DestroyRenderer(rend);
   if (win != NULL)
@@ -284,15 +296,29 @@ void updateGameSdl(Controller *controller) {
             (game->aliens->aliensX - 0.5) *
                 ((width * ALIENS_SWAY_FACTOR) /
                  (double)(game->aliens->nbAliens));
+        // CORRECTION: Les aliens commencent après l'UFO
         double alienY =
             (gridHeight / (double)(game->aliens->nbAlienRows)) * (i + 0.5) +
-            height * HEADER_HEIGHT_RATIO + game->aliens->aliensY * moveRangeY;
+            height * (UFO_HEIGHT_RATIO + 0.05) + game->aliens->aliensY * moveRangeY;
 
         SDL_FRect alienRect = {alienX - alienSizeX / 2, alienY - alienSizeY / 2,
                                alienSizeX, alienSizeY};
         SDL_RenderTexture(rend, aliensTextures[alienIndex / 2][alienIndex % 2],
                           NULL, &alienRect);
-      }
+  }
+}
+    // UFO
+    if (game->aliens->ufoActive) {
+      float ufoSizeX, ufoSizeY;
+      SDL_GetTextureSize(ufoTexture, &ufoSizeX, &ufoSizeY);
+      ufoSizeX *= scale, ufoSizeY *= scale;
+      
+      double ufoX = game->aliens->ufoX * width;
+      double ufoY = UFO_HEIGHT_RATIO * height;
+      
+      SDL_FRect ufoRect = {ufoX - ufoSizeX / 2, ufoY - ufoSizeY / 2,
+                           ufoSizeX, ufoSizeY};
+      SDL_RenderTexture(rend, ufoTexture, NULL, &ufoRect);
     }
 
     // Player shoot
@@ -316,8 +342,7 @@ void updateGameSdl(Controller *controller) {
             scale / 2;
         double alienShootY = game->aliens->alienShotY[i] * height - 2 * scale;
         SDL_FRect alienShootRect = {alienShootX, alienShootY, scale, 4 * scale};
-        SDL_SetRenderDrawColor(rend, 255, 0, 0,
-                               255); // Rouge pour les tirs aliens
+        SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
         SDL_RenderFillRect(rend, &alienShootRect);
       }
     }
