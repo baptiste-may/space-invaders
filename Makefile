@@ -51,5 +51,8 @@ clean :
 	@rm -rf $(OBJ_DIR)
 	@rm -rf doc
 	@rm -f $(TARGET)
+	@rm -rf 3rdParty/SDL/build
+	@rm -rf 3rdParty/SDL_image/build
+	@rm -rf 3rdParty/SDL_ttf/build
 
 -include $(DEPS)

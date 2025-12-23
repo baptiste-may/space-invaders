@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 /**
  * @def ALIEN_SPEED_X
  * @brief The aliens X speed (by tick)
