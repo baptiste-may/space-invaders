@@ -263,7 +263,7 @@ void updateGameSdl(Controller *controller) {
         unsigned k = j + i * game->aliens->nbAliens;
         int alienIndex = game->aliens->aliens[k];
 
-        // Ne pas afficher les aliens morts
+        // Do not display dead aliens
         if (alienIndex < 0)
           continue;
 
