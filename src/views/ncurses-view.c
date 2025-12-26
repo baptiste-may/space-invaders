@@ -65,13 +65,15 @@ void updateGameNcurses(Controller *controller) {
   // Print game
   if (controller->model->currentGame != NULL) {
     Game *game = controller->model->currentGame;
+    const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
 
     // Score and lives
     mvwprintw(gameWin, 1, 2, "Score: %d", game->score);
     mvwprintw(gameWin, 1, maxWidth - 10, "Lives: %d", game->player->lives);
 
     // Player
-    int playerPosition = game->player->position * (maxWidth - 7) + 3;
+    int playerPosition =
+        (int)((game->player->position * GAME_WIDTH_RATIO + margin) * maxWidth);
     mvwprintw(gameWin, maxHeight - 3, playerPosition - 1, "/ \\");
     mvwprintw(gameWin, maxHeight - 2, playerPosition - 2, "[___]");
 
@@ -91,14 +93,16 @@ void updateGameNcurses(Controller *controller) {
           continue;
 
         int alienX =
-            (int)(((maxWidth * GAME_WIDTH_RATIO) /
+            (int)(margin * maxWidth +
+                  ((maxWidth * GAME_WIDTH_RATIO) /
                    (double)(game->aliens->nbAliens)) *
                       (j + 0.5) +
-                  game->aliens->aliensX * ((maxWidth * ALIENS_SWAY_FACTOR) /
-                                           (double)(game->aliens->nbAliens)));
+                  (game->aliens->aliensX - 0.5) *
+                      ((maxWidth * ALIENS_SWAY_FACTOR) /
+                       (double)(game->aliens->nbAliens)));
         int alienY = (int)((gridHeight / (double)(game->aliens->nbAlienRows)) *
                                (i + 0.5) +
-                           maxHeight * HEADER_HEIGHT_RATIO +
+                           maxHeight * (UFO_HEIGHT_RATIO + 0.05) +
                            game->aliens->aliensY * moveRangeY);
 
         switch (alienIndex) {
@@ -130,6 +134,15 @@ void updateGameNcurses(Controller *controller) {
       }
     }
 
+    // UFO
+    if (game->aliens->ufoActive) {
+      int ufoX = (int)(game->aliens->ufoX * maxWidth);
+      int ufoY = (int)(UFO_HEIGHT_RATIO * maxHeight);
+      mvwprintw(gameWin, ufoY - 1, ufoX - 1, "___");
+      mvwprintw(gameWin, ufoY, ufoX - 2, "/___\\");
+      mvwprintw(gameWin, ufoY + 1, ufoX - 2, "\\/ \\/");
+    }
+
     // Shields
     const int shieldsY =
         (int)((1 - PLAYER_HEIGHT_RATIO - SHIELD_HEIGHT_RATIO / 2) * maxHeight);
@@ -155,16 +168,21 @@ void updateGameNcurses(Controller *controller) {
     // Alien shots
     for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
       if (game->aliens->alienShotActive[i]) {
-        double alienShootX = game->aliens->alienShotX[i] * (maxWidth - 5) + 2;
+        double alienShootX =
+            (game->aliens->alienShotX[i] * GAME_WIDTH_RATIO + margin) *
+            maxWidth;
         double alienShootY = game->aliens->alienShotY[i] * maxHeight;
         mvwprintw(gameWin, alienShootY, alienShootX, "|");
       }
     }
 
     // Player shoot
-    int playerShootX = game->player->shootX * (maxWidth - 7) + 3;
-    int playerShootY = game->player->shootY * maxHeight - 1;
-    mvwprintw(gameWin, playerShootY, playerShootX, "|");
+    if (game->player->shootX != -1) {
+      int playerShootX =
+          (int)((game->player->shootX * GAME_WIDTH_RATIO + margin) * maxWidth);
+      int playerShootY = (int)(game->player->shootY * maxHeight);
+      mvwprintw(gameWin, playerShootY, playerShootX, "|");
+    }
   }
 
   wrefresh(gameWin);
