@@ -1,11 +1,11 @@
 #include "aliens.h"
 #include "game.h"
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-static const int UFO_POINTS[] = {100, 50, 50, 100, 150, 100, 100, 50, 
-                                  300, 100, 100, 100, 50, 150, 100, 50};
+static const int UFO_POINTS[] = {100, 50,  50,  100, 150, 100, 100, 50,
+                                 300, 100, 100, 100, 50,  150, 100, 50};
 
 Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows) {
   Aliens *res = (Aliens *)malloc(sizeof(Aliens));
@@ -13,13 +13,13 @@ Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows) {
     perror("Allocation error");
     exit(EXIT_FAILURE);
   }
-  
+
   res->nbAliens = nbAliens;
   res->nbAlienRows = nbAlienRows;
   res->aliensX = 0.5;
   res->aliensY = 0;
   res->alienMovement = ALIEN_SPEED_X;
-  
+
   res->aliens = (int *)calloc(sizeof(int), nbAlienRows * nbAliens);
   if (res->aliens == NULL) {
     perror("Allocation error");
@@ -37,13 +37,13 @@ Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows) {
     res->alienShotX[i] = -1;
     res->alienShotY[i] = -1;
   }
-  
+
   // UFO initialization
   res->ufoActive = false;
   res->ufoX = -1;
   res->ufoDirection = 1;
   res->shotCounter = 0;
-  
+
   return res;
 }
 
@@ -55,18 +55,18 @@ void freeAliens(Aliens *aliens) {
 }
 
 bool moveAliens(Aliens *aliens) {
+  aliens->aliensX += aliens->alienMovement;
+  if (aliens->aliensX < 0 || aliens->aliensX > 1) {
+    aliens->alienMovement = -aliens->alienMovement;
     aliens->aliensX += aliens->alienMovement;
-    if (aliens->aliensX < 0 || aliens->aliensX > 1) {
-      aliens->alienMovement = -aliens->alienMovement;
-      aliens->aliensX += aliens->alienMovement;
-      aliens->aliensY += ALIEN_SPEED_Y;
-      if (aliens->aliensY > 1) {
-        aliens->aliensY -= ALIEN_SPEED_Y;
-        aliens->alienMovement = 0;
-        return true; // Game Over
-      }
+    aliens->aliensY += ALIEN_SPEED_Y;
+    if (aliens->aliensY > 1) {
+      aliens->aliensY -= ALIEN_SPEED_Y;
+      aliens->alienMovement = 0;
+      return true; // Game Over
     }
-    return false;
+  }
+  return false;
 }
 
 void alienShoot(Aliens *aliens) {
@@ -75,17 +75,19 @@ void alienShoot(Aliens *aliens) {
       ALIENS_HEIGHT_RATIO * (1.0 - ALIENS_GRID_HEIGHT_RATIO);
   const double alienStepX = GAME_WIDTH_RATIO / aliens->nbAliens;
   const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
-  const double alienBaseX = margin + (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
-                            (aliens->aliensX - 0.5) *
-                                (ALIENS_SWAY_FACTOR / aliens->nbAliens);
+  const double alienBaseX =
+      margin + (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
+      (aliens->aliensX - 0.5) * (ALIENS_SWAY_FACTOR / aliens->nbAliens);
   const double rowHeight = gridHeight / aliens->nbAlienRows;
-  // CORRECTION: Les aliens commencent après l'UFO (UFO_HEIGHT_RATIO + petit espace)
-  const double alienBaseY = UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
+  // CORRECTION: Les aliens commencent après l'UFO (UFO_HEIGHT_RATIO + petit
+  // espace)
+  const double alienBaseY =
+      UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
 
   for (unsigned i = 0; i < aliens->nbAlienRows; i++) {
     for (unsigned j = 0; j < aliens->nbAliens; j++) {
       unsigned k = j + i * aliens->nbAliens;
-      
+
       if (aliens->aliens[k] < 0)
         continue;
 
@@ -95,11 +97,11 @@ void alienShoot(Aliens *aliens) {
           if (!aliens->alienShotActive[s]) {
             double alienX = alienStepX * j + alienBaseX;
             double alienY = rowHeight * (i + 0.5) + alienBaseY;
-            
+
             aliens->alienShotX[s] = (alienX - margin) / GAME_WIDTH_RATIO;
             aliens->alienShotY[s] = alienY;
             aliens->alienShotActive[s] = true;
-            
+
             break;
           }
         }
@@ -112,7 +114,7 @@ void updateAlienShots(Aliens *aliens) {
   for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
     if (aliens->alienShotActive[i]) {
       aliens->alienShotY[i] += ALIEN_SHOOT_SPEED;
-      
+
       if (aliens->alienShotY[i] > 1.0) {
         aliens->alienShotActive[i] = false;
         aliens->alienShotX[i] = -1;
@@ -123,20 +125,20 @@ void updateAlienShots(Aliens *aliens) {
 }
 
 void animateAliens(Aliens *aliens) {
-    for (unsigned i = 0; i < aliens->nbAlienRows; i++) {
-      for (unsigned j = 0; j < aliens->nbAliens; j++) {
-        unsigned k = j + i * aliens->nbAliens;
-        if (aliens->aliens[k] < 0)
-          continue;
-        aliens->aliens[k] += aliens->aliens[k] % 2 ? -1 : 1;
-      }
+  for (unsigned i = 0; i < aliens->nbAlienRows; i++) {
+    for (unsigned j = 0; j < aliens->nbAliens; j++) {
+      unsigned k = j + i * aliens->nbAliens;
+      if (aliens->aliens[k] < 0)
+        continue;
+      aliens->aliens[k] += aliens->aliens[k] % 2 ? -1 : 1;
     }
+  }
 }
 
 void updateUFO(Aliens *aliens) {
   if (aliens->ufoActive) {
     aliens->ufoX += aliens->ufoDirection * UFO_SPEED;
-    
+
     // UFO sort de l'écran
     if (aliens->ufoX < -0.1 || aliens->ufoX > 1.1) {
       aliens->ufoActive = false;
@@ -199,13 +201,15 @@ int resolveAlienHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
       (ALIEN_HITBOX_HEIGHT_RATIO * gridHeight) / aliens->nbAlienRows / 2.0;
 
   const double alienStepX = GAME_WIDTH_RATIO / aliens->nbAliens;
-  const double alienBaseX = margin + (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
-                            (aliens->aliensX - 0.5) *
-                                (ALIENS_SWAY_FACTOR / aliens->nbAliens);
+  const double alienBaseX =
+      margin + (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
+      (aliens->aliensX - 0.5) * (ALIENS_SWAY_FACTOR / aliens->nbAliens);
 
   const double rowHeight = gridHeight / aliens->nbAlienRows;
-  // SI IL COMMENCE PAS APRES L'UFO AUSSI LES ALIEN ET QUE L'UFO POP DANS LE SCORE NORMAL JE VAIS PAS LE VOIR AUSSI
-  const double alienBaseY = UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
+  // SI IL COMMENCE PAS APRES L'UFO AUSSI LES ALIEN ET QUE L'UFO POP DANS LE
+  // SCORE NORMAL JE VAIS PAS LE VOIR AUSSI
+  const double alienBaseY =
+      UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
 
   for (unsigned i = 0; i < aliens->nbAlienRows; i++) {
     double alienY = rowHeight * (i + 0.5) + alienBaseY;

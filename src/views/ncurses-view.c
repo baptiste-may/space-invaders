@@ -90,34 +90,42 @@ void updateGameNcurses(Controller *controller) {
         if (alienIndex < 0)
           continue;
 
-        int alienX = (int)(
-            ((maxWidth * GAME_WIDTH_RATIO) / (double)(game->aliens->nbAliens)) *
-                (j + 0.5) +
-            game->aliens->aliensX *
-                ((maxWidth * ALIENS_SWAY_FACTOR) / (double)(game->aliens->nbAliens)));
-        int alienY = (int)(
-            (gridHeight / (double)(game->aliens->nbAlienRows)) * (i + 0.5) +
-            maxHeight * HEADER_HEIGHT_RATIO + game->aliens->aliensY * moveRangeY);
+        int alienX =
+            (int)(((maxWidth * GAME_WIDTH_RATIO) /
+                   (double)(game->aliens->nbAliens)) *
+                      (j + 0.5) +
+                  game->aliens->aliensX * ((maxWidth * ALIENS_SWAY_FACTOR) /
+                                           (double)(game->aliens->nbAliens)));
+        int alienY = (int)((gridHeight / (double)(game->aliens->nbAlienRows)) *
+                               (i + 0.5) +
+                           maxHeight * HEADER_HEIGHT_RATIO +
+                           game->aliens->aliensY * moveRangeY);
 
         switch (alienIndex) {
-          case 0:
-          case 1:
-            mvwprintw(gameWin, alienY - 1, alienX - 2, " _^_");
-            mvwprintw(gameWin, alienY, alienX - 2, "(- -)");
-            mvwprintw(gameWin, alienY + 1, alienX - 2, " %c %c", alienIndex == 0 ? '/' : '\\', alienIndex == 0 ? '\\' : '/');
-            break;
-          case 2:
-          case 3:
-            mvwprintw(gameWin, alienY - 1, alienX - 2, "%1$c\\_/%1$c", alienIndex == 2 ? '|' : ' ');
-            mvwprintw(gameWin, alienY, alienX - 2, "%co_o%c", alienIndex == 2 ? '\\' : '/', alienIndex == 2 ? '/' : '\\');
-            mvwprintw(gameWin, alienY + 1, alienX - 2, "%1$c%2$c %3$c%1$c", alienIndex == 2 ? ' ' : '|', alienIndex == 2 ? '/' : '\\', alienIndex == 2 ? '\\' : '/');
-            break;
-          case 4:
-          case 5:
-            mvwprintw(gameWin, alienY - 1, alienX - 1, " ^");
-            mvwprintw(gameWin, alienY, alienX - 1, "/_\\");
-            mvwprintw(gameWin, alienY + 1, alienX - 1, "%c %c", alienIndex == 4 ? '/' : '\\', alienIndex == 4 ? '\\' : '/');
-            break;
+        case 0:
+        case 1:
+          mvwprintw(gameWin, alienY - 1, alienX - 2, " _^_");
+          mvwprintw(gameWin, alienY, alienX - 2, "(- -)");
+          mvwprintw(gameWin, alienY + 1, alienX - 2, " %c %c",
+                    alienIndex == 0 ? '/' : '\\', alienIndex == 0 ? '\\' : '/');
+          break;
+        case 2:
+        case 3:
+          mvwprintw(gameWin, alienY - 1, alienX - 2, "%1$c\\_/%1$c",
+                    alienIndex == 2 ? '|' : ' ');
+          mvwprintw(gameWin, alienY, alienX - 2, "%co_o%c",
+                    alienIndex == 2 ? '\\' : '/', alienIndex == 2 ? '/' : '\\');
+          mvwprintw(gameWin, alienY + 1, alienX - 2, "%1$c%2$c %3$c%1$c",
+                    alienIndex == 2 ? ' ' : '|', alienIndex == 2 ? '/' : '\\',
+                    alienIndex == 2 ? '\\' : '/');
+          break;
+        case 4:
+        case 5:
+          mvwprintw(gameWin, alienY - 1, alienX - 1, " ^");
+          mvwprintw(gameWin, alienY, alienX - 1, "/_\\");
+          mvwprintw(gameWin, alienY + 1, alienX - 1, "%c %c",
+                    alienIndex == 4 ? '/' : '\\', alienIndex == 4 ? '\\' : '/');
+          break;
         }
       }
     }
@@ -138,7 +146,8 @@ void updateGameNcurses(Controller *controller) {
                     block == HALF_EMPTY_LEFT || block == HALF_FULL_LEFT ? '\\'
                     : block == HALF_EMPTY_RIGHT || block == HALF_FULL_RIGHT
                         ? '/'
-                        : block == FULL ? '#' : ':');
+                    : block == FULL ? '#'
+                                    : ':');
         }
       }
     }

@@ -1,9 +1,9 @@
 #include "player.h"
 #include "aliens.h"
 #include "game.h"
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 Player *createPlayer() {
   Player *res = (Player *)malloc(sizeof(Player));
@@ -75,7 +75,6 @@ int resolvePlayerHit(Player *player, Aliens *aliens) {
       }
 
       return 1;
-
     }
   }
   return 0;

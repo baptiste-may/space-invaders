@@ -49,10 +49,10 @@
  * @brief The structure representing the player
  */
 typedef struct {
-  unsigned lives;       //!< The number of lives from the player
-  double position;      //!< The player position in percentage
-  double shootX;        //!< The x coords of the player shoot
-  double shootY;        //!< The y coords of the player shoot
+  unsigned lives;  //!< The number of lives from the player
+  double position; //!< The player position in percentage
+  double shootX;   //!< The x coords of the player shoot
+  double shootY;   //!< The y coords of the player shoot
 } Player;
 
 /**
@@ -100,7 +100,7 @@ void updatePlayerShot(Player *player);
 
 /**
  * @brief Check if the player is hit by any alien shot
- * 
+ *
  * @param player The player structure
  * @param aliens The aliens structure
  * @return 1 if hit, 0 otherwise

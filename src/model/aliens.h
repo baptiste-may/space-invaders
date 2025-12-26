@@ -86,7 +86,7 @@
 typedef struct {
   unsigned nbAliens;    //!< The number of aliens for each row
   unsigned nbAlienRows; //!< The number of alien rows
-  int *aliens;          //!< The grid of aliens where each number is a variety of alien
+  int *aliens; //!< The grid of aliens where each number is a variety of alien
   double aliensX;       //!< The x coords of the most top left alien
   double aliensY;       //!< The y coords of the most top left alien
   double alienMovement; //!< The movement of the aliens
@@ -94,12 +94,13 @@ typedef struct {
   double alienShotX[MAX_ALIEN_SHOTS];    //!< The x coords of alien shots
   double alienShotY[MAX_ALIEN_SHOTS];    //!< The y coords of alien shots
   bool alienShotActive[MAX_ALIEN_SHOTS]; //!< Whether each alien shot is active
-  
+
   // UFO
-  bool ufoActive;       //!< Whether the UFO is currently on screen
-  double ufoX;          //!< The x coordinate of the UFO (0-1)
-  int ufoDirection;     //!< The direction of UFO movement (-1 left, 1 right)
-  unsigned shotCounter; //!< Counter for shots fired (for UFO points calculation)
+  bool ufoActive;   //!< Whether the UFO is currently on screen
+  double ufoX;      //!< The x coordinate of the UFO (0-1)
+  int ufoDirection; //!< The direction of UFO movement (-1 left, 1 right)
+  unsigned
+      shotCounter; //!< Counter for shots fired (for UFO points calculation)
 } Aliens;
 
 /**
@@ -149,7 +150,7 @@ void animateAliens(Aliens *aliens);
 
 /**
  * @brief Check if a shot hits an alien and handle the destruction
- * 
+ *
  * @param aliens The aliens structure
  * @param shotX The x coordinate of the shot (normalized 0-1)
  * @param shotY The y coordinate of the shot (normalized 0-1)

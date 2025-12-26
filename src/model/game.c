@@ -35,25 +35,27 @@ void freeGame(Game *game) {
 
 void nextFrame(Game *game) {
   game->frame = (game->frame + 1) % game->frameMax;
-  
+
   // UFO update
   updateUFO(game->aliens);
-  
+
   // Player shoot
   if (game->player->shootX != -1 && game->player->shootY >= 0) {
     updatePlayerShot(game->player);
-    
+
     // Vérifier collision avec UFO
-    int ufoPoints = resolveUFOHit(game->aliens, game->player->shootX, game->player->shootY);
+    int ufoPoints =
+        resolveUFOHit(game->aliens, game->player->shootX, game->player->shootY);
     if (ufoPoints > 0) {
       game->score += ufoPoints;
       game->player->shootX = -1;
       game->player->shootY = -1;
     }
-    
+
     // Vérifier les collisions à chaque frame
     if (game->player->shootX != -1) {
-      int points = resolveAlienHit(game->aliens, game->player->shootX, game->player->shootY);
+      int points = resolveAlienHit(game->aliens, game->player->shootX,
+                                   game->player->shootY);
       if (points > 0) {
         game->score += points;
         game->player->shootX = -1;
@@ -65,10 +67,10 @@ void nextFrame(Game *game) {
       game->player->shootX = -1;
     }
   }
-  
+
   // Alien shots
   updateAlienShots(game->aliens);
-  
+
   // Check player hit
   if (!game->gameOver) {
     if (resolvePlayerHit(game->player, game->aliens)) {
@@ -78,7 +80,7 @@ void nextFrame(Game *game) {
       }
     }
   }
-  
+
   // Next tick
   if (game->frame == 0) {
     // Aliens sprites

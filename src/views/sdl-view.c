@@ -304,7 +304,7 @@ void updateGameSdl(Controller *controller) {
     renderText(lives, width - 20, 30, white, RIGHT);
 
     // Header border
-    SDL_FRect headerBorderRect = {0, (float)(height) * HEADER_HEIGHT_RATIO - 10,
+    SDL_FRect headerBorderRect = {0, (float)(height)*HEADER_HEIGHT_RATIO - 10,
                                   width, 2};
     SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
     SDL_RenderFillRect(rend, &headerBorderRect);
@@ -347,31 +347,31 @@ void updateGameSdl(Controller *controller) {
             margin * width +
             ((width * GAME_WIDTH_RATIO) / (double)(game->aliens->nbAliens)) *
                 (j + 0.5) +
-            (game->aliens->aliensX - 0.5) *
-                ((width * ALIENS_SWAY_FACTOR) /
-                 (double)(game->aliens->nbAliens));
+            (game->aliens->aliensX - 0.5) * ((width * ALIENS_SWAY_FACTOR) /
+                                             (double)(game->aliens->nbAliens));
         // CORRECTION: Les aliens commencent après l'UFO
         double alienY =
             (gridHeight / (double)(game->aliens->nbAlienRows)) * (i + 0.5) +
-            height * (UFO_HEIGHT_RATIO + 0.05) + game->aliens->aliensY * moveRangeY;
+            height * (UFO_HEIGHT_RATIO + 0.05) +
+            game->aliens->aliensY * moveRangeY;
 
         SDL_FRect alienRect = {alienX - alienSizeX / 2, alienY - alienSizeY / 2,
                                alienSizeX, alienSizeY};
         SDL_RenderTexture(rend, aliensTextures[alienIndex / 2][alienIndex % 2],
                           NULL, &alienRect);
-  }
-}
+      }
+    }
     // UFO
     if (game->aliens->ufoActive) {
       float ufoSizeX, ufoSizeY;
       SDL_GetTextureSize(ufoTexture, &ufoSizeX, &ufoSizeY);
       ufoSizeX *= scale, ufoSizeY *= scale;
-      
+
       double ufoX = game->aliens->ufoX * width;
       double ufoY = UFO_HEIGHT_RATIO * height;
-      
-      SDL_FRect ufoRect = {ufoX - ufoSizeX / 2, ufoY - ufoSizeY / 2,
-                           ufoSizeX, ufoSizeY};
+
+      SDL_FRect ufoRect = {ufoX - ufoSizeX / 2, ufoY - ufoSizeY / 2, ufoSizeX,
+                           ufoSizeY};
       SDL_RenderTexture(rend, ufoTexture, NULL, &ufoRect);
     }
 
