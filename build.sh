@@ -3,7 +3,7 @@
 source /etc/os-release
 case "$ID" in
 "debian" | "ubuntu")
-  sudo apt-get install -y build-essential git make \
+  sudo apt-get install -y build-essential git make doxygen \
     pkg-config cmake ninja-build gnome-desktop-testing libasound2-dev libpulse-dev \
     libaudio-dev libfribidi-dev libjack-dev libsndio-dev libx11-dev libxext-dev \
     libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxtst-dev \
@@ -12,7 +12,7 @@ case "$ID" in
     libfreetype6-dev libharfbuzz-dev
   ;;
 "fedora")
-  sudo dnf install -y gcc git-core make cmake \
+  sudo dnf install -y gcc git-core make cmake doxygen \
     alsa-lib-devel fribidi-devel pulseaudio-libs-devel pipewire-devel \
     libX11-devel libXext-devel libXrandr-devel libXcursor-devel libXfixes-devel \
     libXi-devel libXScrnSaver-devel libXtst-devel dbus-devel ibus-devel \
