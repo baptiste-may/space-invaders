@@ -2,6 +2,7 @@
 
 #include "aliens.h"
 #include "player.h"
+#include "shield.h"
 
 /**
  * @def DEFAULT_FRAME_LENGTH
@@ -32,17 +33,16 @@
  * @brief The structure of a game, including all the informations
  */
 typedef struct {
-  unsigned score;       //!< The current score
-  unsigned nbBuildings; //!< The number of buildings between the aliens and the
-                        //!< player
-  
+  unsigned score; //!< The current score
+
   unsigned frame;    //!< The current frame of the game (for timing, from 0 to
                      //!< frameMax)
   unsigned frameMax; //!< The max number of frame
 
-  Aliens *aliens;    //!< The aliens structure
-  Player *player;    //!< The player structure
-  
+  Aliens *aliens;  //!< The aliens structure
+  Player *player;  //!< The player structure
+  Shields shields; //!< The shields structure
+
   int gameOver; //!< Game over flag (0 = playing, 1 = game over)
 } Game;
 
@@ -51,11 +51,11 @@ typedef struct {
  *
  * @param nbAliens The number of aliens for each row
  * @param nbAlienRows The number of alien rows
- * @param nbBuildings The number of buildings between the aliens and the player
+ * @param nbShields The number of shields between the aliens and the player
  *
  * @return The game structure
  */
-Game *newGame(unsigned nbAliens, unsigned nbAlienRows, unsigned nbBuildings);
+Game *newGame(unsigned nbAliens, unsigned nbAlienRows, unsigned nbShields);
 
 /**
  * @brief Free game structure

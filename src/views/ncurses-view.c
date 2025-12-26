@@ -122,6 +122,27 @@ void updateGameNcurses(Controller *controller) {
       }
     }
 
+    // Shields
+    const int shieldsY =
+        (int)((1 - PLAYER_HEIGHT_RATIO - SHIELD_HEIGHT_RATIO / 2) * maxHeight);
+    const int shieldsXDiff = (int)(maxWidth / game->shields.nb);
+    for (unsigned n = 0; n < game->shields.nb; n++) {
+      const int shieldX = (int)(shieldsXDiff * n + shieldsXDiff / 2);
+      for (unsigned i = 0; i < SHIELD_HEIGHT; i++) {
+        for (unsigned j = 0; j < SHIELD_WIDTH; j++) {
+          ShieldBlock block = game->shields.blocks[n][i][j];
+          if (block == EMPTY)
+            continue;
+          mvwprintw(gameWin, shieldsY - SHIELD_HEIGHT / 2 + i,
+                    shieldX - SHIELD_WIDTH / 2 + j, "%c",
+                    block == HALF_EMPTY_LEFT || block == HALF_FULL_LEFT ? '\\'
+                    : block == HALF_EMPTY_RIGHT || block == HALF_FULL_RIGHT
+                        ? '/'
+                        : block == FULL ? '#' : ':');
+        }
+      }
+    }
+
     // Alien shots
     for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
       if (game->aliens->alienShotActive[i]) {

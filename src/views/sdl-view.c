@@ -200,6 +200,60 @@ void renderText(const char *text, float x, float y, SDL_Color color,
   SDL_DestroySurface(surface);
 }
 
+void renderShieldBlock(double x, double y, ShieldBlock block) {
+  SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
+  const double pixelSize = scale;
+  bool pixels[2][2] = {{false, false}, {false, false}};
+  switch (block) {
+  case EMPTY:
+    break;
+  case FULL:
+    pixels[0][0] = true;
+    pixels[0][1] = true;
+    pixels[1][0] = true;
+    pixels[1][1] = true;
+    break;
+  case HALF_EMPTY_RIGHT:
+    pixels[1][1] = true;
+    break;
+  case HALF_EMPTY_LEFT:
+    pixels[1][0] = true;
+    break;
+  case HALF_FULL_RIGHT:
+    pixels[0][0] = true;
+    pixels[0][1] = true;
+    pixels[1][0] = true;
+    break;
+  case HALF_FULL_LEFT:
+    pixels[0][0] = true;
+    pixels[0][1] = true;
+    pixels[1][1] = true;
+    break;
+  case DESTROYED_RIGHT:
+    pixels[0][1] = true;
+    pixels[1][0] = true;
+    break;
+  case DESTROYED_LEFT:
+    pixels[0][0] = true;
+    pixels[1][1] = true;
+  default:
+    break;
+  }
+
+  SDL_FRect topLeft = {x, y, pixelSize, pixelSize};
+  if (pixels[0][0])
+    SDL_RenderFillRect(rend, &topLeft);
+  SDL_FRect topRight = {x + pixelSize, y, pixelSize, pixelSize};
+  if (pixels[0][1])
+    SDL_RenderFillRect(rend, &topRight);
+  SDL_FRect bottomLeft = {x, y + pixelSize, pixelSize, pixelSize};
+  if (pixels[1][0])
+    SDL_RenderFillRect(rend, &bottomLeft);
+  SDL_FRect bottomRight = {x + pixelSize, y + pixelSize, pixelSize, pixelSize};
+  if (pixels[1][1])
+    SDL_RenderFillRect(rend, &bottomRight);
+}
+
 void createMainMenuSdl(Controller *controller) {
   updateMainMenuSdl(controller);
 }
@@ -319,6 +373,27 @@ void updateGameSdl(Controller *controller) {
       SDL_FRect ufoRect = {ufoX - ufoSizeX / 2, ufoY - ufoSizeY / 2,
                            ufoSizeX, ufoSizeY};
       SDL_RenderTexture(rend, ufoTexture, NULL, &ufoRect);
+    }
+
+    // Shields
+    const double shieldsY =
+        (1 - PLAYER_HEIGHT_RATIO - SHIELD_HEIGHT_RATIO / 2) * height;
+    const double shieldsXDiff = (double)(width) / game->shields.nb;
+    const double blockSize = 2 * scale;
+    const double shieldWidth = SHIELD_WIDTH * blockSize;
+    const double shieldHeight = SHIELD_HEIGHT * blockSize;
+
+    for (unsigned n = 0; n < game->shields.nb; n++) {
+      const double shieldX = shieldsXDiff * n + shieldsXDiff / 2;
+      for (unsigned i = 0; i < SHIELD_HEIGHT; i++) {
+        for (unsigned j = 0; j < SHIELD_WIDTH; j++) {
+          ShieldBlock block = game->shields.blocks[n][i][j];
+          if (block == EMPTY)
+            continue;
+          renderShieldBlock(shieldX - shieldWidth / 2 + j * blockSize,
+                            shieldsY - shieldHeight / 2 + i * blockSize, block);
+        }
+      }
     }
 
     // Player shoot

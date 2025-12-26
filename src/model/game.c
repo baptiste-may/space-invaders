@@ -1,11 +1,11 @@
 #include "game.h"
-#include <math.h>
+#include "shield.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
-              unsigned int nbBuildings) {
+              unsigned int nbShields) {
   srand(time(NULL));
 
   // Creating game
@@ -17,13 +17,10 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
 
   Aliens *aliens = createAliens(nbAliens, nbAlienRows);
   Player *player = createPlayer();
+  Shield *shields = createShields(nbShields);
 
-  *res = (Game){0,
-                nbBuildings,
-                0,
-                DEFAULT_FRAME_LENGTH,
-                aliens,
-                player,
+  *res = (Game){0,      0,      DEFAULT_FRAME_LENGTH,
+                aliens, player, (Shields){nbShields, shields},
                 0};
 
   return res;
@@ -32,6 +29,7 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
 void freeGame(Game *game) {
   freeAliens(game->aliens);
   freePlayer(game->player);
+  freeShields(&(game->shields));
   free(game);
 }
 
