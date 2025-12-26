@@ -4,6 +4,8 @@
 #include <ncurses.h>
 #include <stdbool.h>
 
+// just a test...
+
 void mainLoop(Controller *controller) {
   Model *model = controller->model;
   MainMenu *mainMenu = &(model->mainMenu);
