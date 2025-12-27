@@ -80,8 +80,7 @@ void alienShoot(Aliens *aliens) {
       margin + (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +
       (aliens->aliensX - 0.5) * (ALIENS_SWAY_FACTOR / aliens->nbAliens);
   const double rowHeight = gridHeight / aliens->nbAlienRows;
-  // CORRECTION: Les aliens commencent après l'UFO (UFO_HEIGHT_RATIO + petit
-  // espace)
+  // FIX: Aliens start below the UFO (UFO_HEIGHT_RATIO + small gap)
   const double alienBaseY =
       UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
 
@@ -116,7 +115,7 @@ void updateAlienShots(Aliens *aliens, Shields *shields) {
     if (aliens->alienShotActive[i]) {
       aliens->alienShotY[i] += ALIEN_SHOOT_SPEED;
 
-      // Vérifier collision avec les boucliers
+      // Check collision with shields
       if (checkShieldCollision(shields, aliens->alienShotX[i],
                                aliens->alienShotY[i])) {
         aliens->alienShotActive[i] = false;
@@ -153,17 +152,17 @@ void updateUFO(Aliens *aliens) {
   if (aliens->ufoActive) {
     aliens->ufoX += aliens->ufoDirection * UFO_SPEED;
 
-    // UFO sort de l'écran
+    // UFO goes off screen
     if (aliens->ufoX < -0.1 || aliens->ufoX > 1.1) {
       aliens->ufoActive = false;
       aliens->ufoX = -1;
     }
   } else {
-    // Chance de spawn
+    // Spawn chance
     double randVal = (double)rand() / RAND_MAX;
     if (randVal < UFO_SPAWN_CHANCE) {
       aliens->ufoActive = true;
-      // Spawn aléatoire depuis la gauche ou la droite
+      // Random spawn from left or right
       aliens->ufoDirection = (rand() % 2) ? 1 : -1;
       aliens->ufoX = aliens->ufoDirection == 1 ? -0.05 : 1.05;
     }
@@ -220,8 +219,8 @@ int resolveAlienHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
       (aliens->aliensX - 0.5) * (ALIENS_SWAY_FACTOR / aliens->nbAliens);
 
   const double rowHeight = gridHeight / aliens->nbAlienRows;
-  // SI IL COMMENCE PAS APRES L'UFO AUSSI LES ALIEN ET QUE L'UFO POP DANS LE
-  // SCORE NORMAL JE VAIS PAS LE VOIR AUSSI
+  // Ensure aliens start below the UFO so they don't overlap with the score area
+  // or the UFO path.
   const double alienBaseY =
       UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
 

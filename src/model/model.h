@@ -8,7 +8,7 @@
  * @brief Represent the model
  */
 typedef struct {
-  Game *currentGame; //!< The current game, NULL is there is not
+  Game *currentGame; //!< The current game, NULL if none
   MainMenu mainMenu; //!< The informations about the main menu
 } Model;
 
@@ -20,13 +20,13 @@ typedef struct {
 Model newModel();
 
 /**
- * @brief Start a game from a model
+ * @brief Start a new game instance
  *
  * @param model The model
  */
 void *startGame(Model *model);
 /**
- * @brief Destroy the model by closing and freeing all things inside
+ * @brief Free the model and its resources
  *
  * @param model The model
  */

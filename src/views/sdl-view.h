@@ -65,7 +65,7 @@ void updateGameSdl(Controller *controller);
 void destroyGameSdl();
 
 /**
- * @brief Size all the window using sdl
+ * @brief Resize all the window using sdl
  *
  * @param controller THe controller used
  */

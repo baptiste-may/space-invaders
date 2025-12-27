@@ -54,7 +54,7 @@ void updateGameNcurses(Controller *controller);
 void destroyGameNcurses();
 
 /**
- * @brief Size all windows using ncurses
+ * @brief Resize all windows using ncurses
  *
  * @param The controller used
  */

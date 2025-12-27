@@ -7,8 +7,8 @@
  * @brief The type of view used to play the game
  */
 typedef enum {
-  NCURSES, //!< The app use Ncurses for the view
-  SDL      //!< The app use SDL3 for the view
+  NCURSES, //!< The app uses Ncurses for the view
+  SDL      //!< The app uses SDL3 for the view
 } ViewType;
 
 /**

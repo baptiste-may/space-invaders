@@ -360,7 +360,7 @@ void updateGameSdl(Controller *controller) {
                 (j + 0.5) +
             (game->aliens->aliensX - 0.5) * ((width * ALIENS_SWAY_FACTOR) /
                                              (double)(game->aliens->nbAliens));
-        // CORRECTION: Les aliens commencent après l'UFO
+        // FIX: Aliens start below the UFO
         double alienY =
             (gridHeight / (double)(game->aliens->nbAlienRows)) * (i + 0.5) +
             height * (UFO_HEIGHT_RATIO + 0.05) +

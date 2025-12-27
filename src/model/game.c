@@ -9,7 +9,7 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
               unsigned int nbShields) {
   srand(time(NULL));
 
-  // Creating game
+  // Create game
   Game *res = (Game *)malloc(sizeof(Game));
   if (res == NULL) {
     perror("Allocation error");
@@ -40,7 +40,7 @@ void nextFrame(Game *game) {
   // UFO update
   updateUFO(game->aliens);
 
-  // Player shoot
+  // Handle player shooting
   if (game->player->shootX != -1 && game->player->shootY >= 0) {
     updatePlayerShot(game->player, &game->shields);
 
@@ -69,13 +69,13 @@ void nextFrame(Game *game) {
     }
   }
 
-  // Aliens sprites
+  // Update alien animations
   animateAliens(game->aliens, game->frame == 0);
 
-  // Alien shots
+  // Update alien shots
   updateAlienShots(game->aliens, &game->shields);
 
-  // Check player hit
+  // Check if player is hit
   if (!game->gameOver) {
     if (resolvePlayerHit(game->player, game->aliens)) {
       if (game->player->lives == 0) {
@@ -85,7 +85,7 @@ void nextFrame(Game *game) {
     }
   }
 
-  // Next tick
+  // Handle game tick
   if (game->frame == 0) {
     // Aliens positions
     if (moveAliens(game->aliens)) {

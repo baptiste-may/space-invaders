@@ -4,10 +4,10 @@
 
 /**
  * @enum Event
- * @brief The event sended by the user every frame
+ * @brief The event sent by the user every frame
  */
 typedef enum {
-  NO_EVENT = 0,              //!< No event was sended
+  NO_EVENT = 0,              //!< No event was sent
   EVENT_KEY_UP = 1,          //!< Key pressed up
   EVENT_KEY_DOWN = 1 << 1,   //!< Key pressed down
   EVENT_KEY_LEFT = 1 << 2,   //!< Key pressed left
