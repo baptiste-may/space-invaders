@@ -27,6 +27,7 @@ TTF_Font *font = NULL;
 SDL_Texture *playerTexture = NULL;
 SDL_Texture *aliensTextures[4][2];
 SDL_Texture *ufoTexture = NULL;
+SDL_Texture *explosionTexture = NULL;
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color black = {0, 0, 0, 255};
@@ -89,6 +90,14 @@ void initViewSdl(Controller *controller) {
   }
   SDL_SetTextureScaleMode(ufoTexture, SDL_SCALEMODE_NEAREST);
 
+  explosionTexture = IMG_LoadTexture(rend, "assets/explosion.png");
+  if (explosionTexture == NULL) {
+    fprintf(stderr, "Cannot load explosion texture: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+  SDL_SetTextureScaleMode(explosionTexture, SDL_SCALEMODE_NEAREST);
+
   if (TTF_Init() == false) {
     fprintf(stderr, "Cannot initialize TTF: %s", SDL_GetError());
     closeViewSdl();
@@ -124,6 +133,8 @@ void closeViewSdl() {
   }
   if (ufoTexture != NULL)
     SDL_DestroyTexture(ufoTexture);
+  if (explosionTexture != NULL)
+    SDL_DestroyTexture(explosionTexture);
   if (rend != NULL)
     SDL_DestroyRenderer(rend);
   if (win != NULL)
@@ -332,10 +343,12 @@ void updateGameSdl(Controller *controller) {
         int alienIndex = game->aliens->aliens[k];
 
         // Do not display dead aliens
-        if (alienIndex < 0)
+        if (alienIndex < -EXPLOSION_FRAMES)
           continue;
 
-        SDL_Texture *alienTexture = aliensTextures[alienIndex / 2][0];
+        SDL_Texture *alienTexture =
+            alienIndex < 0 ? explosionTexture
+                           : aliensTextures[alienIndex / 2][alienIndex % 2];
 
         float alienSizeX, alienSizeY;
         SDL_GetTextureSize(alienTexture, &alienSizeX, &alienSizeY);
@@ -355,8 +368,7 @@ void updateGameSdl(Controller *controller) {
 
         SDL_FRect alienRect = {alienX - alienSizeX / 2, alienY - alienSizeY / 2,
                                alienSizeX, alienSizeY};
-        SDL_RenderTexture(rend, aliensTextures[alienIndex / 2][alienIndex % 2],
-                          NULL, &alienRect);
+        SDL_RenderTexture(rend, alienTexture, NULL, &alienRect);
       }
     }
     // UFO

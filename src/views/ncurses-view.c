@@ -89,7 +89,7 @@ void updateGameNcurses(Controller *controller) {
         int alienIndex = game->aliens->aliens[k];
 
         // Do not display dead aliens
-        if (alienIndex < 0)
+        if (alienIndex < -EXPLOSION_FRAMES)
           continue;
 
         int alienX = (int)(margin * maxWidth +
@@ -103,6 +103,13 @@ void updateGameNcurses(Controller *controller) {
                                (i + 0.5) +
                            maxHeight * (UFO_HEIGHT_RATIO + 0.05) +
                            game->aliens->aliensY * moveRangeY);
+
+        if (alienIndex < 0) {
+          mvwprintw(gameWin, alienY - 1, alienX - 1, "\\ /");
+          mvwprintw(gameWin, alienY, alienX - 2, "-- --");
+          mvwprintw(gameWin, alienY + 1, alienX - 1, "/ \\");
+          continue;
+        }
 
         switch (alienIndex) {
         case 0:

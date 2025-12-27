@@ -81,6 +81,12 @@
 #define UFO_SPAWN_CHANCE 0.001
 
 /**
+ * @def EXPLOSION_FRAMES
+ * @brief Number of frames during an explosion
+ */
+#define EXPLOSION_FRAMES 20
+
+/**
  * @struct Aliens
  * @brief The structure representing the aliens group
  */
@@ -147,8 +153,9 @@ void updateAlienShots(Aliens *aliens, Shields *shields);
  * @brief Animate aliens (change sprites)
  *
  * @param aliens The aliens structure
+ * @param isTick The current frame is on a tick
  */
-void animateAliens(Aliens *aliens);
+void animateAliens(Aliens *aliens, bool isTick);
 
 /**
  * @brief Check if a shot hits an alien and handle the destruction

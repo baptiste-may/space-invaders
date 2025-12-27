@@ -1,4 +1,5 @@
 #include "game.h"
+#include "aliens.h"
 #include "shield.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,6 +69,9 @@ void nextFrame(Game *game) {
     }
   }
 
+  // Aliens sprites
+  animateAliens(game->aliens, game->frame == 0);
+
   // Alien shots
   updateAlienShots(game->aliens, &game->shields);
 
@@ -83,9 +87,6 @@ void nextFrame(Game *game) {
 
   // Next tick
   if (game->frame == 0) {
-    // Aliens sprites
-    animateAliens(game->aliens);
-
     // Aliens positions
     if (moveAliens(game->aliens)) {
       game->gameOver = 1;
