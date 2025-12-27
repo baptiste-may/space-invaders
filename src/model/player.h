@@ -1,7 +1,7 @@
 #pragma once
 
-#include "shield.h"
 #include "aliens.h"
+#include "shield.h"
 
 /**
  * @def DEFAULT_LIVES
@@ -13,7 +13,7 @@
  * @def PLAYER_SPEED
  * @brief The player speed
  */
-#define PLAYER_SPEED 0.005
+#define PLAYER_SPEED 0.0025
 
 /**
  * @def SHOOT_SPEED

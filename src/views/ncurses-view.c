@@ -92,14 +92,13 @@ void updateGameNcurses(Controller *controller) {
         if (alienIndex < 0)
           continue;
 
-        int alienX =
-            (int)(margin * maxWidth +
-                  ((maxWidth * GAME_WIDTH_RATIO) /
-                   (double)(game->aliens->nbAliens)) *
-                      (j + 0.5) +
-                  (game->aliens->aliensX - 0.5) *
-                      ((maxWidth * ALIENS_SWAY_FACTOR) /
-                       (double)(game->aliens->nbAliens)));
+        int alienX = (int)(margin * maxWidth +
+                           ((maxWidth * GAME_WIDTH_RATIO) /
+                            (double)(game->aliens->nbAliens)) *
+                               (j + 0.5) +
+                           (game->aliens->aliensX - 0.5) *
+                               ((maxWidth * ALIENS_SWAY_FACTOR) /
+                                (double)(game->aliens->nbAliens)));
         int alienY = (int)((gridHeight / (double)(game->aliens->nbAlienRows)) *
                                (i + 0.5) +
                            maxHeight * (UFO_HEIGHT_RATIO + 0.05) +
@@ -200,6 +199,7 @@ void initViewNcurses(Controller *controller) {
   timeout(10);
   curs_set(0);
   keypad(stdscr, TRUE);
+  nodelay(stdscr, TRUE);
 
   getmaxyx(stdscr, maxHeight, maxWidth);
   refresh();
@@ -214,32 +214,42 @@ void closeViewNcurses() {
 }
 
 Event scanEventNcurses() {
-  int ch = getch();
-  switch (ch) {
-  case ERR:
-    return NO_EVENT;
-  case 'z':
-  case KEY_UP:
-    return EVENT_KEY_UP;
-  case 's':
-  case KEY_DOWN:
-    return EVENT_KEY_DOWN;
-  case 'q':
-  case KEY_LEFT:
-    return EVENT_KEY_LEFT;
-  case 'd':
-  case KEY_RIGHT:
-    return EVENT_KEY_RIGHT;
-  case KEY_RESIZE:
-    return EVENT_RESIZE;
-  case '\n':
-    return EVENT_KEY_ENTER;
-  case 27:
-    return EVENT_KEY_ESCAPE;
-  case ' ':
-    return EVENT_KEY_SPACE;
+  Event res = NO_EVENT;
+  int ch;
+  while ((ch = getch()) != ERR) {
+    switch (ch) {
+    case 'z':
+    case KEY_UP:
+      res |= EVENT_KEY_UP;
+      break;
+    case 's':
+    case KEY_DOWN:
+      res |= EVENT_KEY_DOWN;
+      break;
+    case 'q':
+    case KEY_LEFT:
+      res |= EVENT_KEY_LEFT;
+      break;
+    case 'd':
+    case KEY_RIGHT:
+      res |= EVENT_KEY_RIGHT;
+      break;
+    case KEY_RESIZE:
+      res |= EVENT_RESIZE;
+      break;
+    case '\n':
+      res |= EVENT_KEY_ENTER;
+      break;
+    case 27:
+      res |= EVENT_KEY_ESCAPE;
+      break;
+    case ' ':
+      res |= EVENT_KEY_SPACE;
+      break;
+    }
   }
-  return NO_EVENT;
+  napms(10);
+  return res;
 }
 
 void resizeNcurses(Controller *controller) {

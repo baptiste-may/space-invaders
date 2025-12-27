@@ -4,8 +4,6 @@
 #include <ncurses.h>
 #include <stdbool.h>
 
-// just a test...
-
 void mainLoop(Controller *controller) {
   Model *model = controller->model;
   MainMenu *mainMenu = &(model->mainMenu);
@@ -15,19 +13,16 @@ void mainLoop(Controller *controller) {
   while (closeApp == false) {
     event = scanEvent(controller->view);
 
-    if (event == EVENT_RESIZE) {
+    if (event & EVENT_RESIZE)
       resize(controller);
-      continue;
-    }
 
-    if (event == EVENT_CLOSE) {
+    if (event & EVENT_CLOSE) {
       closeApp = true;
       continue;
     }
 
     if (mainMenu->isOpen == true) {
-      switch (event) {
-      case EVENT_KEY_ENTER:
+      if (event & EVENT_KEY_ENTER) {
         switch (mainMenu->selected) {
         case 0:
           // Play or Continue
@@ -49,43 +44,31 @@ void mainLoop(Controller *controller) {
           closeApp = true;
           break;
         }
-        break;
-      case EVENT_KEY_UP:
+      } else if (event & EVENT_KEY_UP) {
         mainMenu->selected--;
         if (mainMenu->selected < 0)
           mainMenu->selected = 3;
-        break;
-      case EVENT_KEY_DOWN:
+      } else if (event & EVENT_KEY_DOWN)
         mainMenu->selected = (mainMenu->selected + 1) % 4;
-        break;
-      default:
-        break;
-      }
       updateMainMenu(controller);
       continue;
     }
 
     if (model->currentGame != NULL) {
       Game *game = model->currentGame;
-      switch (event) {
-      case EVENT_KEY_ESCAPE:
+      if (event & EVENT_KEY_ESCAPE) {
         createMainMenu(controller);
         mainMenu->isOpen = true;
-        break;
-      case EVENT_KEY_LEFT:
-        playerMoveLeft(game->player);
-        break;
-      case EVENT_KEY_RIGHT:
-        playerMoveRight(game->player);
-        break;
-      case EVENT_KEY_SPACE:
-        playerFire(game->player, game->aliens);
-        break;
-      default:
-        break;
+      } else {
+        if (event & EVENT_KEY_LEFT)
+          playerMoveLeft(game->player);
+        if (event & EVENT_KEY_RIGHT)
+          playerMoveRight(game->player);
+        if (event & EVENT_KEY_SPACE)
+          playerFire(game->player, game->aliens);
+        nextFrame(game);
+        updateGame(controller);
       }
-      nextFrame(game);
-      updateGame(controller);
     }
   }
 }

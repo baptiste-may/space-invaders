@@ -137,42 +137,40 @@ Event scanEventSdl() {
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
     case SDL_EVENT_QUIT:
-      res = EVENT_CLOSE;
+      res |= EVENT_CLOSE;
       break;
     case SDL_EVENT_WINDOW_RESIZED:
-      res = EVENT_RESIZE;
+      res |= EVENT_RESIZE;
       break;
     case SDL_EVENT_KEY_DOWN:
       switch (event.key.key) {
       case SDLK_Z:
       case SDLK_UP:
-        res = EVENT_KEY_UP;
+        res |= EVENT_KEY_UP;
         break;
       case SDLK_S:
       case SDLK_DOWN:
-        res = EVENT_KEY_DOWN;
-        break;
-      case SDLK_Q:
-      case SDLK_LEFT:
-        res = EVENT_KEY_LEFT;
-        break;
-      case SDLK_D:
-      case SDLK_RIGHT:
-        res = EVENT_KEY_RIGHT;
+        res |= EVENT_KEY_DOWN;
         break;
       case SDLK_RETURN:
-        res = EVENT_KEY_ENTER;
+        res |= EVENT_KEY_ENTER;
         break;
       case SDLK_ESCAPE:
-        res = EVENT_KEY_ESCAPE;
-        break;
-      case SDLK_SPACE:
-        res = EVENT_KEY_SPACE;
+        res |= EVENT_KEY_ESCAPE;
         break;
       }
       break;
     }
   }
+
+  const bool *state = SDL_GetKeyboardState(NULL);
+  if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_Q])
+    res |= EVENT_KEY_LEFT;
+  if (state[SDL_SCANCODE_RIGHT] || state[SDL_SCANCODE_D])
+    res |= EVENT_KEY_RIGHT;
+  if (state[SDL_SCANCODE_SPACE])
+    res |= EVENT_KEY_SPACE;
+
   SDL_Delay(10);
   return res;
 }

@@ -7,16 +7,16 @@
  * @brief The event sended by the user every frame
  */
 typedef enum {
-  NO_EVENT,         //!< No event was sended
-  EVENT_KEY_UP,     //!< Key pressed up
-  EVENT_KEY_DOWN,   //!< Key pressed down
-  EVENT_KEY_LEFT,   //!< Key pressed left
-  EVENT_KEY_RIGHT,  //!< Key pressed right
-  EVENT_KEY_ENTER,  //!< Key pressed enter
-  EVENT_KEY_ESCAPE, //!< Key pressed escape
-  EVENT_RESIZE,     //!< The window is resized
-  EVENT_CLOSE,      //!< The window is closed
-  EVENT_KEY_SPACE   //!< Key pressed space
+  NO_EVENT = 0,              //!< No event was sended
+  EVENT_KEY_UP = 1,          //!< Key pressed up
+  EVENT_KEY_DOWN = 1 << 1,   //!< Key pressed down
+  EVENT_KEY_LEFT = 1 << 2,   //!< Key pressed left
+  EVENT_KEY_RIGHT = 1 << 3,  //!< Key pressed right
+  EVENT_KEY_ENTER = 1 << 4,  //!< Key pressed enter
+  EVENT_KEY_ESCAPE = 1 << 5, //!< Key pressed escape
+  EVENT_RESIZE = 1 << 6,     //!< The window is resized
+  EVENT_CLOSE = 1 << 7,      //!< The window is closed
+  EVENT_KEY_SPACE = 1 << 8   //!< Key pressed space
 } Event;
 
 /**
