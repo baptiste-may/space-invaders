@@ -38,7 +38,7 @@ void initViewSdl(Controller *controller) {
     exit(EXIT_FAILURE);
   }
 
-  win = SDL_CreateWindow("Space Invaders", WIDTH, HEIGHT, 0);
+  win = SDL_CreateWindow("Space Invaders", WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
   if (win == NULL) {
     fprintf(stderr, "Cannot create window: %s", SDL_GetError());
     closeViewSdl();
