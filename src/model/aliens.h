@@ -1,4 +1,5 @@
 #pragma once
+#include "shield.h"
 #include <stdbool.h>
 
 /**
@@ -138,8 +139,9 @@ void alienShoot(Aliens *aliens);
  * @brief Update alien shots positions
  *
  * @param aliens The aliens structure
+ * @param shields The shields structure
  */
-void updateAlienShots(Aliens *aliens);
+void updateAlienShots(Aliens *aliens, Shields *shields);
 
 /**
  * @brief Animate aliens (change sprites)

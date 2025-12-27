@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 /**
  * @def SHIELD_WIDTH
@@ -10,7 +11,7 @@
  * @def SHIELD_HEIGHT
  * @brief The height of a shield in blocks
  */
-#define SHIELD_HEIGHT 6
+#define SHIELD_HEIGHT 5
 
 /**
  * @enum ShieldBlock
@@ -56,3 +57,22 @@ Shield *createShields(unsigned nbShields);
  * @param shields The shields structure to free
  */
 void freeShields(Shields *shields);
+
+/**
+ * @brief Apply damage to a shield at a specific position
+ * 
+ * @param shield The shield to damage
+ * @param x The x coordinate (in blocks) where the projectile hit
+ * @param y The y coordinate (in blocks) where the projectile hit
+ */
+void damageShield(Shield shield, int x, int y);
+
+/**
+ * @brief Check if a shot collides with any shield
+ * 
+ * @param shields The shields structure
+ * @param shotX The x coordinate of the shot (normalized 0-1)
+ * @param shotY The y coordinate of the shot (normalized 0-1)
+ * @return true if collision occurred, false otherwise
+ */
+bool checkShieldCollision(Shields *shields, double shotX, double shotY);

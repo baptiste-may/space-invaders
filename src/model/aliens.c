@@ -1,5 +1,6 @@
 #include "aliens.h"
 #include "game.h"
+#include "shield.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -110,10 +111,18 @@ void alienShoot(Aliens *aliens) {
   }
 }
 
-void updateAlienShots(Aliens *aliens) {
+void updateAlienShots(Aliens *aliens, Shields *shields) {
   for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
     if (aliens->alienShotActive[i]) {
       aliens->alienShotY[i] += ALIEN_SHOOT_SPEED;
+
+      // Vérifier collision avec les boucliers
+      if (checkShieldCollision(shields, aliens->alienShotX[i], aliens->alienShotY[i])) {
+        aliens->alienShotActive[i] = false;
+        aliens->alienShotX[i] = -1;
+        aliens->alienShotY[i] = -1;
+        continue;
+      }
 
       if (aliens->alienShotY[i] > 1.0) {
         aliens->alienShotActive[i] = false;

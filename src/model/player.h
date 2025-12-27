@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shield.h"
 #include "aliens.h"
 
 /**
@@ -95,8 +96,9 @@ void playerFire(Player *player, Aliens *aliens);
  * @brief Update player shot position
  *
  * @param player The player structure
+ * @param shields The shields structure
  */
-void updatePlayerShot(Player *player);
+void updatePlayerShot(Player *player, Shields *shields);
 
 /**
  * @brief Check if the player is hit by any alien shot

@@ -41,9 +41,9 @@ void nextFrame(Game *game) {
 
   // Player shoot
   if (game->player->shootX != -1 && game->player->shootY >= 0) {
-    updatePlayerShot(game->player);
+    updatePlayerShot(game->player, &game->shields);
 
-    // Vérifier collision avec UFO
+    // Check collision with UFO
     int ufoPoints =
         resolveUFOHit(game->aliens, game->player->shootX, game->player->shootY);
     if (ufoPoints > 0) {
@@ -52,7 +52,7 @@ void nextFrame(Game *game) {
       game->player->shootY = -1;
     }
 
-    // Vérifier les collisions à chaque frame
+    // Check collisions every frame
     if (game->player->shootX != -1) {
       int points = resolveAlienHit(game->aliens, game->player->shootX,
                                    game->player->shootY);
@@ -69,7 +69,7 @@ void nextFrame(Game *game) {
   }
 
   // Alien shots
-  updateAlienShots(game->aliens);
+  updateAlienShots(game->aliens, &game->shields);
 
   // Check player hit
   if (!game->gameOver) {

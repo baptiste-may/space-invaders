@@ -1,6 +1,8 @@
 #include "player.h"
 #include "aliens.h"
+#include "shield.h"
 #include "game.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,9 +46,15 @@ void playerFire(Player *player, Aliens *aliens) {
   incrementShotCounter(aliens);
 }
 
-void updatePlayerShot(Player *player) {
+void updatePlayerShot(Player *player, Shields *shields) {
   if (player->shootX != -1 && player->shootY >= 0) {
     player->shootY -= SHOOT_SPEED;
+    // Check collision with shields
+    if (checkShieldCollision(shields, player->shootX, player->shootY)) {
+      // Destroy the shot
+      player->shootX = -1;
+      player->shootY = -1;
+    }
   }
 }
 
