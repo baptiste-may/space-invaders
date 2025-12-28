@@ -1,5 +1,6 @@
 #include "game.h"
 #include "aliens.h"
+#include "score.h"
 #include "shield.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,8 +21,12 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
   Player *player = createPlayer();
   Shield *shields = createShields(nbShields);
 
-  *res = (Game){0,      0,      DEFAULT_FRAME_LENGTH,
-                aliens, player, (Shields){nbShields, shields},
+  *res = (Game){0,
+                DEFAULT_FRAME_LENGTH,
+                (Scores){0, getBestScore()},
+                aliens,
+                player,
+                (Shields){nbShields, shields},
                 0};
 
   return res;
@@ -48,7 +53,7 @@ void nextFrame(Game *game) {
     int ufoPoints =
         resolveUFOHit(game->aliens, game->player->shootX, game->player->shootY);
     if (ufoPoints > 0) {
-      game->score += ufoPoints;
+      game->scores.current += ufoPoints;
       game->player->shootX = -1;
       game->player->shootY = -1;
     }
@@ -58,7 +63,7 @@ void nextFrame(Game *game) {
       int points = resolveAlienHit(game->aliens, game->player->shootX,
                                    game->player->shootY);
       if (points > 0) {
-        game->score += points;
+        game->scores.current += points;
         game->player->shootX = -1;
         game->player->shootY = -1;
       }
@@ -68,6 +73,9 @@ void nextFrame(Game *game) {
       game->player->shootX = -1;
     }
   }
+
+  // Update best score
+  updateBestScore(&(game->scores));
 
   // Update alien animations
   animateAliens(game->aliens, game->frame == 0);

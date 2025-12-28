@@ -1,4 +1,5 @@
 #include "ncurses-view.h"
+#include <math.h>
 #include <ncurses.h>
 #include <string.h>
 
@@ -67,8 +68,12 @@ void updateGameNcurses(Controller *controller) {
     Game *game = controller->model->currentGame;
     const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
 
-    // Score and lives
-    mvwprintw(gameWin, 1, 2, "Score: %d", game->score);
+    // Scores and lives
+    mvwprintw(gameWin, 1, 2, "Score: %d", game->scores.current);
+    unsigned bestScoreSize =
+        12 + (unsigned)(floor(log10(game->scores.best)) + 1);
+    mvwprintw(gameWin, 1, maxWidth / 2 - bestScoreSize / 2, "Best scores: %d",
+              game->scores.best);
     mvwprintw(gameWin, 1, maxWidth - 10, "Lives: %d", game->player->lives);
 
     // Player

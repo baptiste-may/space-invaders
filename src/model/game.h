@@ -2,6 +2,7 @@
 
 #include "aliens.h"
 #include "player.h"
+#include "score.h"
 #include "shield.h"
 
 /**
@@ -33,12 +34,11 @@
  * @brief The structure of a game, including all the informations
  */
 typedef struct {
-  unsigned score; //!< The current score
-
   unsigned frame;    //!< The current frame of the game (for timing, from 0 to
                      //!< frameMax)
   unsigned frameMax; //!< The max number of frame
 
+  Scores scores;   //!< The scores structure
   Aliens *aliens;  //!< The aliens structure
   Player *player;  //!< The player structure
   Shields shields; //!< The shields structure

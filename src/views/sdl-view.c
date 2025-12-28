@@ -13,6 +13,7 @@
 #include <SDL3/SDL_video.h>
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
+#include <math.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -303,12 +304,19 @@ void updateGameSdl(Controller *controller) {
     Game *game = model->currentGame;
 
     // Score
-    char score[20];
-    sprintf(score, "Score: %d", game->score);
+    char score[7 + (unsigned)(floor(log10(game->scores.current)) + 1)];
+    sprintf(score, "Score: %d", game->scores.current);
     renderText(score, 20, 30, white, LEFT);
 
+    // Best score
+    unsigned bestScoreSize =
+        12 + (unsigned)(floor(log10(game->scores.best)) + 1);
+    char bestScore[bestScoreSize];
+    sprintf(bestScore, "Best score: %d", game->scores.best);
+    renderText(bestScore, width / 2. - bestScoreSize / 2., 30, white, CENTER);
+
     // Lives
-    char lives[20];
+    char lives[7 + (unsigned)(floor(log10(game->player->lives)) + 1)];
     sprintf(lives, "Lives: %d", game->player->lives);
     renderText(lives, width - 20, 30, white, RIGHT);
 

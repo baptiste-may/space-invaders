@@ -1,6 +1,7 @@
 build
 doc
 main
+best_score.dat
 vgcore*
 3rdParty/SDL/build
 3rdParty/SDL_image/build

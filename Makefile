@@ -6,7 +6,7 @@ CFLAGS ?= -Wall -MMD -g
 else
 CFLAGS ?= -Wall -MMD -O3 -DNDEBUG
 endif
-LDFLAGS = -lncurses -lSDL3 -lSDL3_image -lSDL3_ttf
+LDFLAGS = -lm -lncurses -lSDL3 -lSDL3_image -lSDL3_ttf
 
 INCLUDE_PATH ?=-I3rdParty/SDL/include -I3rdParty/SDL_image/include -I3rdParty/SDL_ttf/include
 LIBRARY_PATH ?=-L3rdParty/SDL/build -L3rdParty/SDL_image/build -L3rdParty/SDL_ttf/build
