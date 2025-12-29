@@ -50,12 +50,42 @@ void mainLoop(Controller *controller) {
           mainMenu->selected = 3;
       } else if (event & EVENT_KEY_DOWN)
         mainMenu->selected = (mainMenu->selected + 1) % 4;
+
       updateMainMenu(controller);
       continue;
     }
 
     if (model->currentGame != NULL) {
       Game *game = model->currentGame;
+
+      // Gérer le menu game over
+      if (game->gameOver) {
+        if (event & EVENT_KEY_UP) {
+          model->gameOverSelected = (model->gameOverSelected - 1 + 2) % 2;
+          updateGame(controller);
+        } else if (event & EVENT_KEY_DOWN) {
+          model->gameOverSelected = (model->gameOverSelected + 1) % 2;
+          updateGame(controller);
+        } else if (event & EVENT_KEY_ENTER) {
+          if (model->gameOverSelected == 0) {
+            // Restart : créer une nouvelle partie
+            freeGame(model->currentGame);
+            startGame(model);
+            model->gameOverSelected = 0;
+            updateGame(controller);
+          } else {
+            // Main Menu : retourner au menu principal
+            freeGame(model->currentGame);
+            model->currentGame = NULL;
+            model->gameOverSelected = 0;
+            createMainMenu(controller);
+            mainMenu->isOpen = true;
+          }
+        }
+        continue;
+      }
+
+      // Jeu normal
       if (event & EVENT_KEY_ESCAPE) {
         createMainMenu(controller);
         mainMenu->isOpen = true;
@@ -66,6 +96,7 @@ void mainLoop(Controller *controller) {
           playerMoveRight(game->player);
         if (event & EVENT_KEY_SPACE)
           playerFire(game->player, game->aliens);
+
         nextFrame(game);
         updateGame(controller);
       }

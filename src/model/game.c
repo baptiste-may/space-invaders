@@ -88,7 +88,7 @@ void nextFrame(Game *game) {
     if (resolvePlayerHit(game->player, game->aliens)) {
       if (game->player->lives == 0) {
         game->gameOver = 1;
-        exit(EXIT_SUCCESS);
+
       }
     }
   }

@@ -303,6 +303,32 @@ void updateGameSdl(Controller *controller) {
   if (model->currentGame != NULL) {
     Game *game = model->currentGame;
 
+    // Afficher le Game Over si le jeu est terminé
+    if (game->gameOver) {
+      renderText("GAME OVER", (float)(width) / 2, (float)(height) / 2 - 100, 
+                 white, CENTER);
+      
+      char finalScore[64];
+      snprintf(finalScore, sizeof(finalScore), "Final Score: %d", game->scores.current);
+      renderText(finalScore, (float)(width) / 2, (float)(height) / 2 - 50, 
+                 white, CENTER);
+      
+      char bestScore[64];
+      snprintf(bestScore, sizeof(bestScore), "Best Score: %d", game->scores.best);
+      renderText(bestScore, (float)(width) / 2, (float)(height) / 2, 
+                 (SDL_Color){128, 128, 128, 255}, CENTER);
+      
+      // Menu options
+      int selected = model->gameOverSelected;
+      renderText("Restart", (float)(width) / 2, (float)(height) / 2 + 60,
+                 selected == 0 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+      renderText("Main Menu", (float)(width) / 2, (float)(height) / 2 + 100,
+                 selected == 1 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+      
+      SDL_RenderPresent(rend);
+      return;
+    }
+
     // Just try a buffer instead of dynamics, for score, best score and live. 
     // Score
     char score[64];
