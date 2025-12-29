@@ -303,21 +303,22 @@ void updateGameSdl(Controller *controller) {
   if (model->currentGame != NULL) {
     Game *game = model->currentGame;
 
+    // Just try a buffer instead of dynamics, for score, best score and live. 
     // Score
-    char score[7 + (unsigned)(floor(log10(game->scores.current)) + 1)];
-    sprintf(score, "Score: %d", game->scores.current);
+    char score[64];
+    snprintf(score, sizeof(score), "Score: %d", game->scores.current);
     renderText(score, 20, 30, white, LEFT);
 
     // Best score
     unsigned bestScoreSize =
         12 + (unsigned)(floor(log10(game->scores.best)) + 1);
-    char bestScore[bestScoreSize];
-    sprintf(bestScore, "Best score: %d", game->scores.best);
+    char bestScore[64];
+    snprintf(bestScore, sizeof(bestScore), "Best score: %d", game->scores.best);
     renderText(bestScore, width / 2. - bestScoreSize / 2., 30, white, CENTER);
 
     // Lives
-    char lives[7 + (unsigned)(floor(log10(game->player->lives)) + 1)];
-    sprintf(lives, "Lives: %d", game->player->lives);
+    char lives[64];
+    snprintf(lives, sizeof(lives), "Lives: %d", game->player->lives);
     renderText(lives, width - 20, 30, white, RIGHT);
 
     // Header border

@@ -10,8 +10,10 @@ unsigned getBestScore() {
   char c;
   unsigned res = 0;
   while ((c = fgetc(file)) != EOF) {
-    res *= 10;
-    res += atoi(&c);
+    if (c >= '0' && c <= '9') { 
+      res *= 10;
+      res += (c - '0');
+    }
   }
   fclose(file);
   return res;
