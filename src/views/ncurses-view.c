@@ -12,18 +12,48 @@ WINDOW *mainMenu = NULL;
 const char mainMenuTitle[] = "Space Invaders";
 const unsigned mainMenuWidth = 18, mainMenuHeight = 7;
 
+// Game over Menu
+WINDOW *gameOverMenu = NULL;
+const char gameOverTitle[] = "GAME OVER";
+const unsigned gameOverWidth = 18, gameOverHeight = 7;
+
 // Game Window
 WINDOW *gameWin = NULL;
 
 static void destroyMainMenuNcurses() {
   if (mainMenu != NULL) {
+    wclear(mainMenu);
+    wrefresh(mainMenu);
     delwin(mainMenu);
     mainMenu = NULL;
+    if (gameWin != NULL) {
+      touchwin(gameWin);
+      wrefresh(gameWin);
+    } else {
+      touchwin(stdscr);
+      refresh();
+    }
+  }
+}
+
+static void destroyGameOverNcurses() {
+  if (gameOverMenu != NULL) {
+    wclear(gameOverMenu);
+    wrefresh(gameOverMenu);
+    delwin(gameOverMenu);
+    gameOverMenu = NULL;
+    if (gameWin != NULL) {
+      wclear(gameWin);
+      wrefresh(gameWin);
+    } else {
+      touchwin(stdscr);
+      refresh();
+    }
   }
 }
 
 static void updateMainMenuNcurses(Controller *controller) {
-  int selected = controller->model->mainMenu.selected;
+  unsigned selected = controller->model->mainMenu.selected;
 
   wclear(mainMenu);
   mvwin(mainMenu, (maxHeight - mainMenuHeight) / 2,
@@ -46,18 +76,68 @@ static void updateMainMenuNcurses(Controller *controller) {
   wrefresh(mainMenu);
 }
 
+static void updateGameOverMenuNcurses(Controller *controller) {
+  unsigned selected = controller->model->gameOverMenu.selected;
+
+  wclear(gameOverMenu);
+  mvwin(gameOverMenu, (maxHeight - gameOverHeight) / 2,
+        (maxWidth - gameOverWidth) / 2);
+  box(gameOverMenu, 0, 0);
+
+  if (controller->model->currentGame == NULL)
+    return;
+  Scores scores = controller->model->currentGame->scores;
+
+  mvwprintw(gameOverMenu, 0, (gameOverWidth - strlen(gameOverTitle)) / 2,
+            gameOverTitle);
+
+  int currentScoreLen =
+      13 + (scores.current == 0 ? 1 : (int)floor(log10(scores.current)) + 1);
+  mvwprintw(gameOverMenu, 2, (gameOverWidth - currentScoreLen) / 2,
+            "Final Score: %d", scores.current);
+
+  int bestScoreLen =
+      12 + (scores.best == 0 ? 1 : (int)floor(log10(scores.best)) + 1);
+  mvwprintw(gameOverMenu, 3, (gameOverWidth - bestScoreLen) / 2,
+            "Best Score: %d", scores.best);
+
+  wattrset(gameOverMenu, selected == 0 ? A_REVERSE : A_NORMAL);
+  mvwprintw(gameOverMenu, 4, (gameOverWidth - 7) / 2, "Restart");
+
+  wattrset(gameOverMenu, selected == 1 ? A_REVERSE : A_NORMAL);
+  mvwprintw(gameOverMenu, 5, (gameOverWidth - 9) / 2, "Main Menu");
+
+  wattrset(gameOverMenu, A_NORMAL);
+  wrefresh(gameWin);
+  wrefresh(gameOverMenu);
+}
+
 static void createMainMenuNcurses(Controller *controller) {
+  if (mainMenu != NULL)
+    delwin(mainMenu);
   mainMenu =
       newwin(mainMenuHeight, mainMenuWidth, (maxHeight - mainMenuHeight) / 2,
              (maxWidth - mainMenuWidth) / 2);
-  controller->model->mainMenu.selected = 0;
   updateMainMenuNcurses(controller);
+}
+
+static void createGameOverMenuNcurses(Controller *controller) {
+  if (gameOverMenu != NULL)
+    delwin(gameOverMenu);
+  gameOverMenu =
+      newwin(gameOverHeight, gameOverWidth, (maxHeight - gameOverHeight) / 2,
+             (maxWidth - gameOverWidth) / 2);
+  updateGameOverMenuNcurses(controller);
 }
 
 static void destroyGameNcurses() {
   if (gameWin != NULL) {
+    wclear(gameWin);
+    wrefresh(gameWin);
     delwin(gameWin);
     gameWin = NULL;
+    touchwin(stdscr);
+    refresh();
   }
 }
 
@@ -82,8 +162,17 @@ static void updateGameNcurses(Controller *controller) {
     // Player
     int playerPosition =
         (int)((game->player->position * GAME_WIDTH_RATIO + margin) * maxWidth);
-    mvwprintw(gameWin, maxHeight - 3, playerPosition - 1, "/ \\");
-    mvwprintw(gameWin, maxHeight - 2, playerPosition - 2, "[___]");
+
+    if (game->playerDeathFrame >= 0 &&
+        game->playerDeathFrame < PLAYER_DEATH_FRAMES) {
+      if (game->playerDeathFrame < PLAYER_DEATH_FRAMES / 2) {
+        mvwprintw(gameWin, maxHeight - 3, playerPosition - 1, "\\ /");
+        mvwprintw(gameWin, maxHeight - 2, playerPosition - 2, "-- --");
+      }
+    } else {
+      mvwprintw(gameWin, maxHeight - 3, playerPosition - 1, "/ \\");
+      mvwprintw(gameWin, maxHeight - 2, playerPosition - 2, "[___]");
+    }
 
     // Aliens
     double gridHeight =
@@ -203,6 +292,8 @@ static void updateGameNcurses(Controller *controller) {
 }
 
 static void createGameNcurses(Controller *controller) {
+  if (gameWin != NULL)
+    delwin(gameWin);
   gameWin = newwin(maxHeight, maxWidth, 0, 0);
   updateGameNcurses(controller);
 }
@@ -211,7 +302,6 @@ static void initViewNcurses(Controller *controller) {
   initscr();
   cbreak();
   noecho();
-  timeout(10);
   curs_set(0);
   keypad(stdscr, TRUE);
   nodelay(stdscr, TRUE);
@@ -276,9 +366,17 @@ static void resizeNcurses(Controller *controller) {
 }
 
 ViewInterface getNcursesInterface() {
-  return (ViewInterface){initViewNcurses,       closeViewNcurses,
-                         scanEventNcurses,      createMainMenuNcurses,
-                         updateMainMenuNcurses, destroyMainMenuNcurses,
-                         createGameNcurses,     updateGameNcurses,
-                         destroyGameNcurses,    resizeNcurses};
+  return (ViewInterface){initViewNcurses,
+                         closeViewNcurses,
+                         scanEventNcurses,
+                         createMainMenuNcurses,
+                         updateMainMenuNcurses,
+                         destroyMainMenuNcurses,
+                         createGameNcurses,
+                         updateGameNcurses,
+                         destroyGameNcurses,
+                         createGameOverMenuNcurses,
+                         updateGameOverMenuNcurses,
+                         destroyGameOverNcurses,
+                         resizeNcurses};
 }

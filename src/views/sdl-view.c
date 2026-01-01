@@ -40,102 +40,7 @@ SDL_Texture *explosionTexture = NULL;
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color black = {0, 0, 0, 255};
 
-// Forward declaration
-static void resizeSdl(Controller *controller);
-static void createMainMenuSdl(Controller *controller);
-static void updateMainMenuSdl(Controller *controller);
-static void closeViewSdl();
-static void destroyMainMenuSdl();
-static void destroyGameSdl();
-static void updateGameSdl(Controller *controller);
-static void createGameSdl(Controller *controller);
-
-static void initViewSdl(Controller *controller) {
-  if (SDL_Init(SDL_INIT_VIDEO) == false) {
-    fprintf(stderr, "Cannot initialize SDL: %s\n", SDL_GetError());
-    exit(EXIT_FAILURE);
-  }
-
-  win = SDL_CreateWindow("Space Invaders", WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
-  if (win == NULL) {
-    fprintf(stderr, "Cannot create window: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
-
-  rend = SDL_CreateRenderer(win, NULL);
-  if (rend == NULL) {
-    fprintf(stderr, "Cannot create renderer: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
-
-  // Load player texture
-  playerTexture = IMG_LoadTexture(rend, "assets/player.png");
-  if (playerTexture == NULL) {
-    fprintf(stderr, "Cannot load player texture: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
-  SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
-
-  // Load aliens textures
-  for (unsigned i = 1; i <= 4; i++) {
-    char imagePath[20];
-    for (unsigned j = 1; j <= 2; j++) {
-      if (i != 4)
-        sprintf(imagePath, "assets/alien%u-%u.png", i, j);
-      else
-        sprintf(imagePath, "assets/alien4.png");
-      aliensTextures[i - 1][j - 1] = IMG_LoadTexture(rend, imagePath);
-      if (aliensTextures[i - 1][j - 1] == NULL) {
-        fprintf(stderr, "Cannot load alien n°%u with texture n°%u: %s", i, j,
-                SDL_GetError());
-        closeViewSdl();
-        exit(EXIT_FAILURE);
-      }
-      SDL_SetTextureScaleMode(aliensTextures[i - 1][j - 1],
-                              SDL_SCALEMODE_NEAREST);
-    }
-  }
-
-  // Load UFO texture
-  ufoTexture = IMG_LoadTexture(rend, "assets/alien4.png");
-  if (ufoTexture == NULL) {
-    fprintf(stderr, "Cannot load UFO texture: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
-  SDL_SetTextureScaleMode(ufoTexture, SDL_SCALEMODE_NEAREST);
-
-  explosionTexture = IMG_LoadTexture(rend, "assets/explosion.png");
-  if (explosionTexture == NULL) {
-    fprintf(stderr, "Cannot load explosion texture: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
-  SDL_SetTextureScaleMode(explosionTexture, SDL_SCALEMODE_NEAREST);
-
-  if (TTF_Init() == false) {
-    fprintf(stderr, "Cannot initialize TTF: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
-
-  font = TTF_OpenFont("assets/editundo.ttf", FONT_SIZE);
-  if (font == NULL) {
-    fprintf(stderr, "Cannot load font: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
-
-  SDL_RenderClear(rend);
-  SDL_RenderPresent(rend);
-
-  resizeSdl(controller);
-
-  createMainMenuSdl(controller);
-}
+static void renderGameElementsSdl(Controller *controller);
 
 static void closeViewSdl() {
   if (font != NULL)
@@ -160,48 +65,9 @@ static void closeViewSdl() {
   SDL_Quit();
 }
 
-static Event scanEventSdl() {
-  SDL_Event event;
-  Event res = NO_EVENT;
-  while (SDL_PollEvent(&event)) {
-    switch (event.type) {
-    case SDL_EVENT_QUIT:
-      res |= EVENT_CLOSE;
-      break;
-    case SDL_EVENT_WINDOW_RESIZED:
-      res |= EVENT_RESIZE;
-      break;
-    case SDL_EVENT_KEY_DOWN:
-      switch (event.key.key) {
-      case SDLK_Z:
-      case SDLK_UP:
-        res |= EVENT_KEY_UP;
-        break;
-      case SDLK_S:
-      case SDLK_DOWN:
-        res |= EVENT_KEY_DOWN;
-        break;
-      case SDLK_RETURN:
-        res |= EVENT_KEY_ENTER;
-        break;
-      case SDLK_ESCAPE:
-        res |= EVENT_KEY_ESCAPE;
-        break;
-      }
-      break;
-    }
-  }
-
-  const bool *state = SDL_GetKeyboardState(NULL);
-  if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_Q])
-    res |= EVENT_KEY_LEFT;
-  if (state[SDL_SCANCODE_RIGHT] || state[SDL_SCANCODE_D])
-    res |= EVENT_KEY_RIGHT;
-  if (state[SDL_SCANCODE_SPACE])
-    res |= EVENT_KEY_SPACE;
-
-  SDL_Delay(10);
-  return res;
+static void resizeSdl(Controller *controller) {
+  SDL_GetWindowSize(win, &width, &height);
+  scale = (double)(width) / 640 + (double)(height) / 480;
 }
 
 static void renderText(const char *text, float x, float y, SDL_Color color,
@@ -225,6 +91,91 @@ static void renderText(const char *text, float x, float y, SDL_Color color,
   SDL_RenderTexture(rend, texture, NULL, &rect);
   SDL_DestroyTexture(texture);
   SDL_DestroySurface(surface);
+}
+
+static void renderBox(float boxWidth, float boxHeight, float boxX, float boxY,
+                      float boxOutline) {
+  SDL_FRect bgOutline = {boxX - boxOutline, boxY - boxOutline,
+                         boxWidth + boxOutline * 2, boxHeight + boxOutline * 2};
+  SDL_SetRenderDrawColor(rend, 255, 255, 255, 255);
+  SDL_RenderFillRect(rend, &bgOutline);
+  SDL_FRect bg = {boxX, boxY, boxWidth, boxHeight};
+  SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+  SDL_RenderFillRect(rend, &bg);
+}
+
+static void updateMainMenuSdl(Controller *controller) {
+  SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+  SDL_RenderClear(rend);
+
+  renderGameElementsSdl(controller);
+
+  Model *model = controller->model;
+  int selected = model->mainMenu.selected;
+
+  double winWidth = 400, winHeight = 350;
+  float boxX = (float)(width - winWidth) / 2;
+  float boxY = (float)(height - winHeight) / 2;
+  renderBox(winWidth, winHeight, boxX, boxY, 2);
+
+  renderText("Space Invaders", boxX + (float)winWidth / 2, boxY + 50, white,
+             CENTER);
+
+  renderText(model->currentGame == NULL ? "Play" : "Continue",
+             boxX + (float)winWidth / 2, boxY + 150,
+             selected == 0 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+  renderText("Credit", boxX + (float)winWidth / 2, boxY + 200,
+             selected == 1 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+  renderText("Quit", boxX + (float)winWidth / 2, boxY + 250,
+             selected == 2 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+
+  SDL_RenderPresent(rend);
+}
+
+static void updateGameOverMenuSdl(Controller *controller) {
+  SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+  SDL_RenderClear(rend);
+
+  renderGameElementsSdl(controller);
+
+  Game *game = controller->model->currentGame;
+  if (game == NULL)
+    return;
+
+  double winWidth = 400, winHeight = 350;
+  float boxX = (float)(width - winWidth) / 2;
+  float boxY = (float)(height - winHeight) / 2;
+  renderBox(winWidth, winHeight, boxX, boxY, 2);
+
+  renderText("GAME OVER", boxX + (float)winWidth / 2, boxY + 50, white, CENTER);
+
+  char finalScore[64];
+  snprintf(finalScore, sizeof(finalScore), "Final Score: %d",
+           game->scores.current);
+  renderText(finalScore, boxX + (float)winWidth / 2, boxY + 120, white, CENTER);
+
+  char bestScore[64];
+  snprintf(bestScore, sizeof(bestScore), "Best Score: %d", game->scores.best);
+  renderText(bestScore, boxX + (float)winWidth / 2, boxY + 170,
+             (SDL_Color){128, 128, 128, 255}, CENTER);
+
+  // Menu options
+  int selected = controller->model->gameOverMenu.selected;
+
+  renderText("Restart", boxX + (float)winWidth / 2, boxY + 240,
+             selected == 0 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+  renderText("Main Menu", boxX + (float)winWidth / 2, boxY + 290,
+             selected == 1 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+
+  SDL_RenderPresent(rend);
+}
+
+static void createMainMenuSdl(Controller *controller) {
+  updateMainMenuSdl(controller);
+}
+
+static void createGameOverMenuSdl(Controller *controller) {
+  updateGameOverMenuSdl(controller);
 }
 
 static void renderShieldBlock(double x, double y, ShieldBlock block) {
@@ -281,72 +232,11 @@ static void renderShieldBlock(double x, double y, ShieldBlock block) {
     SDL_RenderFillRect(rend, &bottomRight);
 }
 
-static void createMainMenuSdl(Controller *controller) {
-  updateMainMenuSdl(controller);
-}
-
-static void updateMainMenuSdl(Controller *controller) {
-  SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-  SDL_RenderClear(rend);
-
-  Model *model = controller->model;
-  int selected = model->mainMenu.selected;
-
-  renderText("Space Invaders", (float)(width) / 2, 50, white, CENTER);
-
-  renderText(model->currentGame == NULL ? "Play" : "Continue",
-             (float)(width) / 2, 150,
-             selected == 0 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
-  renderText("Credit", (float)(width) / 2, 200,
-             selected == 1 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
-  renderText("Quit", (float)(width) / 2, 250,
-             selected == 2 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
-
-  SDL_RenderPresent(rend);
-}
-
-static void destroyMainMenuSdl() {}
-
-static void createGameSdl(Controller *controller) { updateGameSdl(controller); }
-
-static void updateGameSdl(Controller *controller) {
-  SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
-  SDL_RenderClear(rend);
-
+static void renderGameElementsSdl(Controller *controller) {
   Model *model = controller->model;
 
   if (model->currentGame != NULL) {
     Game *game = model->currentGame;
-
-    // Display Game Over if game is finished
-    if (game->gameOver) {
-      renderText("GAME OVER", (float)(width) / 2, (float)(height) / 2 - 100,
-                 white, CENTER);
-
-      char finalScore[64];
-      snprintf(finalScore, sizeof(finalScore), "Final Score: %d",
-               game->scores.current);
-      renderText(finalScore, (float)(width) / 2, (float)(height) / 2 - 50,
-                 white, CENTER);
-
-      char bestScore[64];
-      snprintf(bestScore, sizeof(bestScore), "Best Score: %d",
-               game->scores.best);
-      renderText(bestScore, (float)(width) / 2, (float)(height) / 2,
-                 (SDL_Color){128, 128, 128, 255}, CENTER);
-
-      // Menu options
-      int selected = model->gameOverMenu.selected;
-      renderText("Restart", (float)(width) / 2, (float)(height) / 2 + 60,
-                 selected == 0 ? white : (SDL_Color){128, 128, 128, 255},
-                 CENTER);
-      renderText("Main Menu", (float)(width) / 2, (float)(height) / 2 + 100,
-                 selected == 1 ? white : (SDL_Color){128, 128, 128, 255},
-                 CENTER);
-
-      SDL_RenderPresent(rend);
-      return;
-    }
 
     // Just try a buffer instead of dynamics, for score, best score and live.
     // Score
@@ -503,20 +393,164 @@ static void updateGameSdl(Controller *controller) {
       }
     }
   }
+}
 
+static void updateGameSdl(Controller *controller) {
+  SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+  SDL_RenderClear(rend);
+  renderGameElementsSdl(controller);
   SDL_RenderPresent(rend);
 }
 
+static void createGameSdl(Controller *controller) { updateGameSdl(controller); }
+
+static void destroyMainMenuSdl() {}
+static void destroyGameOverMenuSdl() {}
 static void destroyGameSdl() {}
 
-static void resizeSdl(Controller *controller) {
-  SDL_GetWindowSize(win, &width, &height);
-  scale = (double)(width) / 640 + (double)(height) / 480;
+static void initViewSdl(Controller *controller) {
+  if (SDL_Init(SDL_INIT_VIDEO) == false) {
+    fprintf(stderr, "Cannot initialize SDL: %s\n", SDL_GetError());
+    exit(EXIT_FAILURE);
+  }
+
+  win = SDL_CreateWindow("Space Invaders", WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
+  if (win == NULL) {
+    fprintf(stderr, "Cannot create window: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+
+  rend = SDL_CreateRenderer(win, NULL);
+  if (rend == NULL) {
+    fprintf(stderr, "Cannot create renderer: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+
+  // Load player texture
+  playerTexture = IMG_LoadTexture(rend, "assets/player.png");
+  if (playerTexture == NULL) {
+    fprintf(stderr, "Cannot load player texture: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+  SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
+
+  // Load aliens textures
+  for (unsigned i = 1; i <= 4; i++) {
+    char imagePath[20];
+    for (unsigned j = 1; j <= 2; j++) {
+      if (i != 4)
+        sprintf(imagePath, "assets/alien%u-%u.png", i, j);
+      else
+        sprintf(imagePath, "assets/alien4.png");
+      aliensTextures[i - 1][j - 1] = IMG_LoadTexture(rend, imagePath);
+      if (aliensTextures[i - 1][j - 1] == NULL) {
+        fprintf(stderr, "Cannot load alien n°%u with texture n°%u: %s", i, j,
+                SDL_GetError());
+        closeViewSdl();
+        exit(EXIT_FAILURE);
+      }
+      SDL_SetTextureScaleMode(aliensTextures[i - 1][j - 1],
+                              SDL_SCALEMODE_NEAREST);
+    }
+  }
+
+  // Load UFO texture
+  ufoTexture = IMG_LoadTexture(rend, "assets/alien4.png");
+  if (ufoTexture == NULL) {
+    fprintf(stderr, "Cannot load UFO texture: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+  SDL_SetTextureScaleMode(ufoTexture, SDL_SCALEMODE_NEAREST);
+
+  explosionTexture = IMG_LoadTexture(rend, "assets/explosion.png");
+  if (explosionTexture == NULL) {
+    fprintf(stderr, "Cannot load explosion texture: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+  SDL_SetTextureScaleMode(explosionTexture, SDL_SCALEMODE_NEAREST);
+
+  if (TTF_Init() == false) {
+    fprintf(stderr, "Cannot initialize TTF: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+
+  font = TTF_OpenFont("assets/editundo.ttf", FONT_SIZE);
+  if (font == NULL) {
+    fprintf(stderr, "Cannot load font: %s", SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+
+  SDL_RenderClear(rend);
+  SDL_RenderPresent(rend);
+
+  resizeSdl(controller);
+
+  createMainMenuSdl(controller);
+}
+
+static Event scanEventSdl() {
+  SDL_Event event;
+  Event res = NO_EVENT;
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+    case SDL_EVENT_QUIT:
+      res |= EVENT_CLOSE;
+      break;
+    case SDL_EVENT_WINDOW_RESIZED:
+      res |= EVENT_RESIZE;
+      break;
+    case SDL_EVENT_KEY_DOWN:
+      switch (event.key.key) {
+      case SDLK_Z:
+      case SDLK_UP:
+        res |= EVENT_KEY_UP;
+        break;
+      case SDLK_S:
+      case SDLK_DOWN:
+        res |= EVENT_KEY_DOWN;
+        break;
+      case SDLK_RETURN:
+        res |= EVENT_KEY_ENTER;
+        break;
+      case SDLK_ESCAPE:
+        res |= EVENT_KEY_ESCAPE;
+        break;
+      }
+      break;
+    }
+  }
+
+  const bool *state = SDL_GetKeyboardState(NULL);
+  if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_Q])
+    res |= EVENT_KEY_LEFT;
+  if (state[SDL_SCANCODE_RIGHT] || state[SDL_SCANCODE_D])
+    res |= EVENT_KEY_RIGHT;
+  if (state[SDL_SCANCODE_SPACE])
+    res |= EVENT_KEY_SPACE;
+
+  SDL_Delay(10);
+  return res;
 }
 
 ViewInterface getSdlInterface() {
-  return (ViewInterface){
-      initViewSdl,       closeViewSdl,       scanEventSdl,  createMainMenuSdl,
-      updateMainMenuSdl, destroyMainMenuSdl, createGameSdl, updateGameSdl,
-      destroyGameSdl,    resizeSdl};
+  return (ViewInterface){initViewSdl,
+                         closeViewSdl,
+                         scanEventSdl,
+                         createMainMenuSdl,
+                         updateMainMenuSdl,
+                         destroyMainMenuSdl,
+                         createGameSdl,
+                         updateGameSdl,
+                         destroyGameSdl,
+                         createGameOverMenuSdl,
+                         updateGameOverMenuSdl,
+                         destroyGameOverMenuSdl,
+                         resizeSdl};
 }

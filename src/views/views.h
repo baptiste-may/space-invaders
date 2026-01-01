@@ -25,6 +25,9 @@ typedef struct ViewInterface {
   void (*createGame)(Controller *controller);
   void (*updateGame)(Controller *controller);
   void (*destroyGame)();
+  void (*createGameOverMenu)(Controller *controller);
+  void (*updateGameOverMenu)(Controller *controller);
+  void (*destroyGameOverMenu)();
   void (*resize)(Controller *controller);
 } ViewInterface;
 
