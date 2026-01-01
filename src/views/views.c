@@ -14,108 +14,34 @@ ViewType getViewType(const char *arg) {
   exit(EXIT_FAILURE);
 }
 
-void initView(Controller *controller) {
-  switch (controller->view) {
+Controller *initView(ViewType viewType, Model *model) {
+  Controller *controller = malloc(sizeof(Controller));
+  if (controller == NULL) {
+      perror("Failed to allocate memory for controller");
+      exit(EXIT_FAILURE);
+  }
+  controller->model = model;
+
+  controller->view = malloc(sizeof(ViewInterface));
+  if (controller->view == NULL) {
+      perror("Failed to allocate memory for view interface");
+      free(controller);
+      exit(EXIT_FAILURE);
+  }
+
+  switch (viewType) {
   case NCURSES:
-    initViewNcurses(controller);
+    *controller->view = getNcursesInterface();
     break;
   case SDL:
-    initViewSdl(controller);
+    *controller->view = getSdlInterface();
     break;
   }
+  
+  if (controller->view->init) {
+    controller->view->init(controller);
+  }
+  
   controller->model->mainMenu.isOpen = true;
-}
-
-void closeView(ViewType viewType) {
-  switch (viewType) {
-  case NCURSES:
-    closeViewNcurses();
-    break;
-  case SDL:
-    closeViewSdl();
-    break;
-  }
-}
-
-Event scanEvent(ViewType viewType) {
-  switch (viewType) {
-  case NCURSES:
-    return scanEventNcurses();
-  case SDL:
-    return scanEventSdl();
-  }
-  return NO_EVENT;
-}
-
-void createMainMenu(Controller *controller) {
-  switch (controller->view) {
-  case NCURSES:
-    createMainMenuNcurses(controller);
-    break;
-  case SDL:
-    createMainMenuSdl(controller);
-    break;
-  }
-}
-void updateMainMenu(Controller *controller) {
-  switch (controller->view) {
-  case NCURSES:
-    updateMainMenuNcurses(controller);
-    break;
-  case SDL:
-    updateMainMenuSdl(controller);
-    break;
-  }
-}
-void destroyMainMenu(ViewType viewType) {
-  switch (viewType) {
-  case NCURSES:
-    destroyMainMenuNcurses();
-    break;
-  case SDL:
-    destroyMainMenuSdl();
-    break;
-  }
-}
-
-void createGame(Controller *controller) {
-  switch (controller->view) {
-  case NCURSES:
-    createGameNcurses(controller);
-    break;
-  case SDL:
-    createGameSdl(controller);
-    break;
-  }
-}
-void updateGame(Controller *controller) {
-  switch (controller->view) {
-  case NCURSES:
-    updateGameNcurses(controller);
-    break;
-  case SDL:
-    updateGameSdl(controller);
-    break;
-  }
-}
-void destroyGame(ViewType viewType) {
-  switch (viewType) {
-  case NCURSES:
-    destroyGameNcurses();
-    break;
-  case SDL:
-    destroyGameSdl();
-    break;
-  }
-}
-
-void resize(Controller *controller) {
-  switch (controller->view) {
-  case NCURSES:
-    resizeNcurses(controller);
-    break;
-  case SDL:
-    resizeSdl(controller);
-    break;
-  }
+  return controller;
 }

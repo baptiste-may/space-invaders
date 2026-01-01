@@ -1,4 +1,5 @@
 #include "sdl-view.h"
+#include "../controller/controller.h"
 #include "views.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_error.h>
@@ -19,6 +20,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define WIDTH 1280
+#define HEIGHT 720
+#define FONT_SIZE 36
+
+typedef enum { LEFT, CENTER, RIGHT } TextAlign;
+
 int width, height;
 double scale = 1;
 
@@ -33,7 +40,17 @@ SDL_Texture *explosionTexture = NULL;
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color black = {0, 0, 0, 255};
 
-void initViewSdl(Controller *controller) {
+// Forward declaration
+static void resizeSdl(Controller *controller);
+static void createMainMenuSdl(Controller *controller);
+static void updateMainMenuSdl(Controller *controller);
+static void closeViewSdl();
+static void destroyMainMenuSdl();
+static void destroyGameSdl();
+static void updateGameSdl(Controller *controller);
+static void createGameSdl(Controller *controller);
+
+static void initViewSdl(Controller *controller) {
   if (SDL_Init(SDL_INIT_VIDEO) == false) {
     fprintf(stderr, "Cannot initialize SDL: %s\n", SDL_GetError());
     exit(EXIT_FAILURE);
@@ -115,12 +132,12 @@ void initViewSdl(Controller *controller) {
   SDL_RenderClear(rend);
   SDL_RenderPresent(rend);
 
-  resize(controller);
+  resizeSdl(controller);
 
   createMainMenuSdl(controller);
 }
 
-void closeViewSdl() {
+static void closeViewSdl() {
   if (font != NULL)
     TTF_CloseFont(font);
   TTF_Quit();
@@ -143,7 +160,7 @@ void closeViewSdl() {
   SDL_Quit();
 }
 
-Event scanEventSdl() {
+static Event scanEventSdl() {
   SDL_Event event;
   Event res = NO_EVENT;
   while (SDL_PollEvent(&event)) {
@@ -187,8 +204,8 @@ Event scanEventSdl() {
   return res;
 }
 
-void renderText(const char *text, float x, float y, SDL_Color color,
-                TextAlign textAlign) {
+static void renderText(const char *text, float x, float y, SDL_Color color,
+                       TextAlign textAlign) {
   int text_width, text_height;
   TTF_GetStringSize(font, text, 0, &text_width, &text_height);
 
@@ -210,7 +227,7 @@ void renderText(const char *text, float x, float y, SDL_Color color,
   SDL_DestroySurface(surface);
 }
 
-void renderShieldBlock(double x, double y, ShieldBlock block) {
+static void renderShieldBlock(double x, double y, ShieldBlock block) {
   SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
   const double pixelSize = scale;
   bool pixels[2][2] = {{false, false}, {false, false}};
@@ -264,11 +281,11 @@ void renderShieldBlock(double x, double y, ShieldBlock block) {
     SDL_RenderFillRect(rend, &bottomRight);
 }
 
-void createMainMenuSdl(Controller *controller) {
+static void createMainMenuSdl(Controller *controller) {
   updateMainMenuSdl(controller);
 }
 
-void updateMainMenuSdl(Controller *controller) {
+static void updateMainMenuSdl(Controller *controller) {
   SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
   SDL_RenderClear(rend);
 
@@ -288,11 +305,11 @@ void updateMainMenuSdl(Controller *controller) {
   SDL_RenderPresent(rend);
 }
 
-void destroyMainMenuSdl() {}
+static void destroyMainMenuSdl() {}
 
-void createGameSdl(Controller *controller) { updateGameSdl(controller); }
+static void createGameSdl(Controller *controller) { updateGameSdl(controller); }
 
-void updateGameSdl(Controller *controller) {
+static void updateGameSdl(Controller *controller) {
   SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
   SDL_RenderClear(rend);
 
@@ -490,9 +507,16 @@ void updateGameSdl(Controller *controller) {
   SDL_RenderPresent(rend);
 }
 
-void destroyGameSdl() {}
+static void destroyGameSdl() {}
 
-void resizeSdl(Controller *controller) {
+static void resizeSdl(Controller *controller) {
   SDL_GetWindowSize(win, &width, &height);
   scale = (double)(width) / 640 + (double)(height) / 480;
+}
+
+ViewInterface getSdlInterface() {
+  return (ViewInterface){
+      initViewSdl,       closeViewSdl,       scanEventSdl,  createMainMenuSdl,
+      updateMainMenuSdl, destroyMainMenuSdl, createGameSdl, updateGameSdl,
+      destroyGameSdl,    resizeSdl};
 }

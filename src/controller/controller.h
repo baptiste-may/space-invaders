@@ -20,13 +20,15 @@ typedef enum {
   EVENT_KEY_SPACE = 1 << 8   //!< Key pressed space
 } Event;
 
+struct ViewInterface;
+
 /**
  * @struct Controller
  * @brief The structure of the controller
  */
 typedef struct {
-  Model *model; //!< The model where the informations are stocked
-  int view;     //!< The view used for the user
+  Model *model;               //!< The model where the informations are stocked
+  struct ViewInterface *view; //!< The view used for the user
 } Controller;
 
 /**

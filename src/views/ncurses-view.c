@@ -1,4 +1,6 @@
 #include "ncurses-view.h"
+#include "../controller/controller.h"
+#include "views.h"
 #include <math.h>
 #include <ncurses.h>
 #include <string.h>
@@ -13,12 +15,14 @@ const unsigned mainMenuWidth = 18, mainMenuHeight = 7;
 // Game Window
 WINDOW *gameWin = NULL;
 
-void destroyMainMenuNcurses() {
-  delwin(mainMenu);
-  mainMenu = NULL;
+static void destroyMainMenuNcurses() {
+  if (mainMenu != NULL) {
+    delwin(mainMenu);
+    mainMenu = NULL;
+  }
 }
 
-void updateMainMenuNcurses(Controller *controller) {
+static void updateMainMenuNcurses(Controller *controller) {
   int selected = controller->model->mainMenu.selected;
 
   wclear(mainMenu);
@@ -42,7 +46,7 @@ void updateMainMenuNcurses(Controller *controller) {
   wrefresh(mainMenu);
 }
 
-void createMainMenuNcurses(Controller *controller) {
+static void createMainMenuNcurses(Controller *controller) {
   mainMenu =
       newwin(mainMenuHeight, mainMenuWidth, (maxHeight - mainMenuHeight) / 2,
              (maxWidth - mainMenuWidth) / 2);
@@ -50,12 +54,14 @@ void createMainMenuNcurses(Controller *controller) {
   updateMainMenuNcurses(controller);
 }
 
-void destroyGameNcurses() {
-  delwin(gameWin);
-  gameWin = NULL;
+static void destroyGameNcurses() {
+  if (gameWin != NULL) {
+    delwin(gameWin);
+    gameWin = NULL;
+  }
 }
 
-void updateGameNcurses(Controller *controller) {
+static void updateGameNcurses(Controller *controller) {
   wclear(gameWin);
   wresize(gameWin, maxHeight, maxWidth);
   box(gameWin, 0, 0);
@@ -196,12 +202,12 @@ void updateGameNcurses(Controller *controller) {
   wrefresh(gameWin);
 }
 
-void createGameNcurses(Controller *controller) {
+static void createGameNcurses(Controller *controller) {
   gameWin = newwin(maxHeight, maxWidth, 0, 0);
   updateGameNcurses(controller);
 }
 
-void initViewNcurses(Controller *controller) {
+static void initViewNcurses(Controller *controller) {
   initscr();
   cbreak();
   noecho();
@@ -216,13 +222,13 @@ void initViewNcurses(Controller *controller) {
   createMainMenuNcurses(controller);
 }
 
-void closeViewNcurses() {
+static void closeViewNcurses() {
   destroyMainMenuNcurses();
   destroyGameNcurses();
   endwin();
 }
 
-Event scanEventNcurses() {
+static Event scanEventNcurses() {
   Event res = NO_EVENT;
   int ch;
   while ((ch = getch()) != ERR) {
@@ -261,10 +267,18 @@ Event scanEventNcurses() {
   return res;
 }
 
-void resizeNcurses(Controller *controller) {
+static void resizeNcurses(Controller *controller) {
   getmaxyx(stdscr, maxHeight, maxWidth);
   if (mainMenu != NULL)
     updateMainMenuNcurses(controller);
   if (gameWin != NULL)
     updateGameNcurses(controller);
+}
+
+ViewInterface getNcursesInterface() {
+  return (ViewInterface){initViewNcurses,       closeViewNcurses,
+                         scanEventNcurses,      createMainMenuNcurses,
+                         updateMainMenuNcurses, destroyMainMenuNcurses,
+                         createGameNcurses,     updateGameNcurses,
+                         destroyGameNcurses,    resizeNcurses};
 }

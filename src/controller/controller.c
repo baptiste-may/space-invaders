@@ -23,10 +23,10 @@ void mainLoop(Controller *controller) {
   bool closeApp = false;
   Event event;
   while (closeApp == false) {
-    event = scanEvent(controller->view);
+    event = controller->view->scanEvent();
 
     if (event & EVENT_RESIZE)
-      resize(controller);
+      controller->view->resize(controller);
 
     if (event & EVENT_CLOSE) {
       closeApp = true;
@@ -38,11 +38,11 @@ void mainLoop(Controller *controller) {
         switch (mainMenu->selected) {
         case 0:
           // Play or Continue
-          destroyMainMenu(controller->view);
+          controller->view->destroyMainMenu();
           mainMenu->isOpen = false;
           if (model->currentGame == NULL) {
             startGame(model);
-            createGame(controller);
+            controller->view->createGame(controller);
           }
           break;
         case 1:
@@ -55,7 +55,7 @@ void mainLoop(Controller *controller) {
         }
       }
 
-      updateMainMenu(controller);
+      controller->view->updateMainMenu(controller);
       continue;
     }
 
@@ -71,11 +71,11 @@ void mainLoop(Controller *controller) {
           if (gameOverMenu->selected == 0) {
             // Restart: create a new game
             startGame(model);
-            updateGame(controller);
+            controller->view->updateGame(controller);
           } else {
             // Main Menu: return to main menu
             mainMenu->isOpen = true;
-            createMainMenu(controller);
+            controller->view->createMainMenu(controller);
           }
           gameOverMenu->selected = 0;
           continue;
@@ -84,7 +84,7 @@ void mainLoop(Controller *controller) {
 
       // Normal gameplay
       if (event & EVENT_KEY_ESCAPE) {
-        createMainMenu(controller);
+        controller->view->createMainMenu(controller);
         mainMenu->isOpen = true;
       } else {
         // Block all inputs if player is exploding
@@ -97,7 +97,7 @@ void mainLoop(Controller *controller) {
             playerFire(game->player, game->aliens);
         }
         nextFrame(game);
-        updateGame(controller);
+        controller->view->updateGame(controller);
       }
     }
   }

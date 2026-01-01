@@ -12,12 +12,13 @@ int main(int argc, char **args) {
 
   ViewType viewType = getViewType(args[1]);
   Model model = newModel();
-  Controller controller = {&model, viewType};
-  initView(&controller);
+  Controller *controller = initView(viewType, &model);
 
-  mainLoop(&controller);
+  mainLoop(controller);
 
-  closeView(viewType);
+  controller->view->close();
+  free(controller->view);
+  free(controller);
   destroyModel(&model);
   return EXIT_SUCCESS;
 }
