@@ -303,33 +303,37 @@ void updateGameSdl(Controller *controller) {
   if (model->currentGame != NULL) {
     Game *game = model->currentGame;
 
-    // Afficher le Game Over si le jeu est terminé
+    // Display Game Over if game is finished
     if (game->gameOver) {
-      renderText("GAME OVER", (float)(width) / 2, (float)(height) / 2 - 100, 
+      renderText("GAME OVER", (float)(width) / 2, (float)(height) / 2 - 100,
                  white, CENTER);
-      
+
       char finalScore[64];
-      snprintf(finalScore, sizeof(finalScore), "Final Score: %d", game->scores.current);
-      renderText(finalScore, (float)(width) / 2, (float)(height) / 2 - 50, 
+      snprintf(finalScore, sizeof(finalScore), "Final Score: %d",
+               game->scores.current);
+      renderText(finalScore, (float)(width) / 2, (float)(height) / 2 - 50,
                  white, CENTER);
-      
+
       char bestScore[64];
-      snprintf(bestScore, sizeof(bestScore), "Best Score: %d", game->scores.best);
-      renderText(bestScore, (float)(width) / 2, (float)(height) / 2, 
+      snprintf(bestScore, sizeof(bestScore), "Best Score: %d",
+               game->scores.best);
+      renderText(bestScore, (float)(width) / 2, (float)(height) / 2,
                  (SDL_Color){128, 128, 128, 255}, CENTER);
-      
+
       // Menu options
       int selected = model->gameOverSelected;
       renderText("Restart", (float)(width) / 2, (float)(height) / 2 + 60,
-                 selected == 0 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+                 selected == 0 ? white : (SDL_Color){128, 128, 128, 255},
+                 CENTER);
       renderText("Main Menu", (float)(width) / 2, (float)(height) / 2 + 100,
-                 selected == 1 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
-      
+                 selected == 1 ? white : (SDL_Color){128, 128, 128, 255},
+                 CENTER);
+
       SDL_RenderPresent(rend);
       return;
     }
 
-    // Just try a buffer instead of dynamics, for score, best score and live. 
+    // Just try a buffer instead of dynamics, for score, best score and live.
     // Score
     char score[64];
     snprintf(score, sizeof(score), "Score: %d", game->scores.current);
@@ -339,7 +343,8 @@ void updateGameSdl(Controller *controller) {
     unsigned bestScoreSize =
         12 + (unsigned)(floor(log10(game->scores.best)) + 1);
     char bestScore[64];
-    snprintf(bestScore, sizeof(bestScore), "Best score: %d", game->scores.best);
+    snprintf(bestScore, sizeof(bestScore), "Best score: %d",
+             game->scores.best);
     renderText(bestScore, width / 2. - bestScoreSize / 2., 30, white, CENTER);
 
     // Lives
@@ -353,17 +358,33 @@ void updateGameSdl(Controller *controller) {
     SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
     SDL_RenderFillRect(rend, &headerBorderRect);
 
-    // Player
-    float playerSizeX = 13 * scale;
-    float playerSizeY = 8 * scale;
-    // Align visual player position with logical position (including margin)
-    float playerX = (game->player->position * GAME_WIDTH_RATIO +
-                     (1.0 - GAME_WIDTH_RATIO) / 2.0) *
-                        width -
-                    playerSizeX / 2;
-    SDL_FRect playerRect = {playerX, height * 0.975 - playerSizeY, playerSizeX,
-                            playerSizeY};
-    SDL_RenderTexture(rend, playerTexture, NULL, &playerRect);
+    // Player - with death animation
+    if (game->playerDeathFrame >= 0 && game->playerDeathFrame < PLAYER_DEATH_FRAMES) {
+      // Show explosion for first half of animation
+      if (game->playerDeathFrame < PLAYER_DEATH_FRAMES / 2) {
+        float playerSizeX = 13 * scale;
+        float playerSizeY = 8 * scale;
+        float playerX = (game->player->position * GAME_WIDTH_RATIO +
+                         (1.0 - GAME_WIDTH_RATIO) / 2.0) *
+                            width -
+                        playerSizeX / 2;
+        SDL_FRect explosionRect = {playerX, height * 0.975 - playerSizeY,
+                                   playerSizeX, playerSizeY};
+        SDL_RenderTexture(rend, explosionTexture, NULL, &explosionRect);
+      }
+      // Second half is empty (pause)
+    } else {
+      // Normal player rendering
+      float playerSizeX = 13 * scale;
+      float playerSizeY = 8 * scale;
+      float playerX = (game->player->position * GAME_WIDTH_RATIO +
+                       (1.0 - GAME_WIDTH_RATIO) / 2.0) *
+                          width -
+                      playerSizeX / 2;
+      SDL_FRect playerRect = {playerX, height * 0.975 - playerSizeY,
+                              playerSizeX, playerSizeY};
+      SDL_RenderTexture(rend, playerTexture, NULL, &playerRect);
+    }
 
     // Aliens
     const double gridHeight =
@@ -401,8 +422,8 @@ void updateGameSdl(Controller *controller) {
             height * (UFO_HEIGHT_RATIO + 0.05) +
             game->aliens->aliensY * moveRangeY;
 
-        SDL_FRect alienRect = {alienX - alienSizeX / 2, alienY - alienSizeY / 2,
-                               alienSizeX, alienSizeY};
+        SDL_FRect alienRect = {alienX - alienSizeX / 2,
+                               alienY - alienSizeY / 2, alienSizeX, alienSizeY};
         SDL_RenderTexture(rend, alienTexture, NULL, &alienRect);
       }
     }
@@ -461,7 +482,8 @@ void updateGameSdl(Controller *controller) {
             (game->aliens->alienShotX[i] * GAME_WIDTH_RATIO + margin) * width -
             scale / 2;
         double alienShootY = game->aliens->alienShotY[i] * height - 2 * scale;
-        SDL_FRect alienShootRect = {alienShootX, alienShootY, scale, 4 * scale};
+        SDL_FRect alienShootRect = {alienShootX, alienShootY, scale,
+                                    4 * scale};
         SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
         SDL_RenderFillRect(rend, &alienShootRect);
       }

@@ -17,7 +17,7 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
     exit(EXIT_FAILURE);
   }
 
-  Aliens *aliens = createAliens(nbAliens, nbAlienRows);
+  Aliens *aliens = createAliens(nbAliens, nbAlienRows, 1.0);
   Player *player = createPlayer();
   Shield *shields = createShields(nbShields);
 
@@ -27,7 +27,10 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
                 aliens,
                 player,
                 (Shields){nbShields, shields},
-                0};
+                0,
+                -1,  // playerDeathFrame
+                0,   // waveTransitionFrame
+                1.0}; // currentAlienSpeed
 
   return res;
 }
@@ -40,7 +43,51 @@ void freeGame(Game *game) {
 }
 
 void nextFrame(Game *game) {
+  // Handle player death animation - freeze everything
+  if (game->playerDeathFrame >= 0) {
+    game->playerDeathFrame++;
+    if (game->playerDeathFrame >= PLAYER_DEATH_FRAMES) {
+      game->playerDeathFrame = -1;
+      // Player stays at same position
+    }
+    // Don't increment frame counter, completely freeze the game
+    return;
+  }
+
   game->frame = (game->frame + 1) % game->frameMax;
+
+  // Handle wave transition (fast restart)
+  if (game->waveTransitionFrame > 0) {
+    game->waveTransitionFrame++;
+    if (game->waveTransitionFrame >= 30) { // 30 frames = 0.5 seconds
+      // Increase speed for next wave (20% faster)
+      game->currentAlienSpeed *= 1.2;
+      
+      // Recreate aliens at the top with new speed
+      freeAliens(game->aliens);
+      game->aliens = createAliens(11, 5, game->currentAlienSpeed);
+      
+      // Give bonus life to player
+      game->player->lives++;
+      
+      game->waveTransitionFrame = 0;
+    }
+    return;
+  }
+
+  // Check if all aliens are dead
+  bool allDead = true;
+  for (unsigned i = 0; i < game->aliens->nbAlienRows * game->aliens->nbAliens; i++) {
+    if (game->aliens->aliens[i] >= -EXPLOSION_FRAMES) {
+      allDead = false;
+      break;
+    }
+  }
+  
+  if (allDead) {
+    game->waveTransitionFrame = 1;
+    return;
+  }
 
   // UFO update
   updateUFO(game->aliens);
@@ -88,7 +135,9 @@ void nextFrame(Game *game) {
     if (resolvePlayerHit(game->player, game->aliens)) {
       if (game->player->lives == 0) {
         game->gameOver = 1;
-
+      } else {
+        // Start death animation
+        game->playerDeathFrame = 0;
       }
     }
   }

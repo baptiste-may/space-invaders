@@ -1,5 +1,4 @@
 #pragma once
-
 #include "aliens.h"
 #include "player.h"
 #include "score.h"
@@ -30,6 +29,12 @@
 #define GAME_WIDTH_RATIO 0.9
 
 /**
+ * @def PLAYER_DEATH_FRAMES
+ * @brief Number of frames for player death animation
+ */
+#define PLAYER_DEATH_FRAMES 60
+
+/**
  * @struct Game
  * @brief The structure of a game, including all the informations
  */
@@ -38,12 +43,15 @@ typedef struct {
                      //!< frameMax)
   unsigned frameMax; //!< The max number of frame
 
-  Scores scores;   //!< The scores structure
-  Aliens *aliens;  //!< The aliens structure
-  Player *player;  //!< The player structure
-  Shields shields; //!< The shields structure
+  Scores scores;     //!< The scores structure
+  Aliens *aliens;    //!< The aliens structure
+  Player *player;    //!< The player structure
+  Shields shields;   //!< The shields structure
 
-  int gameOver; //!< Game over flag (0 = playing, 1 = game over)
+  int gameOver;      //!< Game over flag (0 = playing, 1 = game over)
+  int playerDeathFrame; //!< Frame counter for player death animation (-1 = not dying)
+  int waveTransitionFrame; //!< Frame counter for wave transition (0 = no transition)
+  double currentAlienSpeed; //!< Current alien speed multiplier
 } Game;
 
 /**

@@ -8,7 +8,7 @@
 static const int UFO_POINTS[] = {100, 50,  50,  100, 150, 100, 100, 50,
                                  300, 100, 100, 100, 50,  150, 100, 50};
 
-Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows) {
+Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows, double speedMultiplier) {
   Aliens *res = (Aliens *)malloc(sizeof(Aliens));
   if (res == NULL) {
     perror("Allocation error");
@@ -19,7 +19,7 @@ Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows) {
   res->nbAlienRows = nbAlienRows;
   res->aliensX = 0.5;
   res->aliensY = 0;
-  res->alienMovement = ALIEN_SPEED_X;
+  res->alienMovement = ALIEN_SPEED_X * speedMultiplier;
 
   res->aliens = (int *)calloc(sizeof(int), nbAlienRows * nbAliens);
   if (res->aliens == NULL) {

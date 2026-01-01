@@ -72,7 +72,7 @@
  * @def UFO_SPEED
  * @brief The UFO horizontal speed
  */
-#define UFO_SPEED 0.0001
+#define UFO_SPEED 0.003
 
 /**
  * @def UFO_SPAWN_CHANCE
@@ -115,9 +115,10 @@ typedef struct {
  *
  * @param nbAliens The number of aliens for each row
  * @param nbAlienRows The number of alien rows
+ * @param speedMultiplier The speed multiplier for this wave (1.0 = normal speed)
  * @return The aliens structure
  */
-Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows);
+Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows, double speedMultiplier);
 
 /**
  * @brief Free aliens structure
