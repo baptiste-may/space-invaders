@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game.h"
-#include "main-menu.h"
+#include "menu.h"
 
 /**
  * @struct Model
@@ -9,8 +9,8 @@
  */
 typedef struct {
   Game *currentGame; //!< The current game, NULL if none
-  MainMenu mainMenu; //!< The informations about the main menu
-  int gameOverSelected; //!< The information about the game over option selected
+  Menu mainMenu;     //!< The informations about the main menu
+  Menu gameOverMenu; //!< The informations about the game over menu
 } Model;
 
 /**

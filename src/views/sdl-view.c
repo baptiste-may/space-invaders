@@ -280,12 +280,10 @@ void updateMainMenuSdl(Controller *controller) {
   renderText(model->currentGame == NULL ? "Play" : "Continue",
              (float)(width) / 2, 150,
              selected == 0 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
-  renderText("Settings", (float)(width) / 2, 200,
+  renderText("Credit", (float)(width) / 2, 200,
              selected == 1 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
-  renderText("Credit", (float)(width) / 2, 250,
+  renderText("Quit", (float)(width) / 2, 250,
              selected == 2 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
-  renderText("Quit", (float)(width) / 2, 300,
-             selected == 3 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
 
   SDL_RenderPresent(rend);
 }
@@ -321,7 +319,7 @@ void updateGameSdl(Controller *controller) {
                  (SDL_Color){128, 128, 128, 255}, CENTER);
 
       // Menu options
-      int selected = model->gameOverSelected;
+      int selected = model->gameOverMenu.selected;
       renderText("Restart", (float)(width) / 2, (float)(height) / 2 + 60,
                  selected == 0 ? white : (SDL_Color){128, 128, 128, 255},
                  CENTER);
@@ -343,8 +341,7 @@ void updateGameSdl(Controller *controller) {
     unsigned bestScoreSize =
         12 + (unsigned)(floor(log10(game->scores.best)) + 1);
     char bestScore[64];
-    snprintf(bestScore, sizeof(bestScore), "Best score: %d",
-             game->scores.best);
+    snprintf(bestScore, sizeof(bestScore), "Best score: %d", game->scores.best);
     renderText(bestScore, width / 2. - bestScoreSize / 2., 30, white, CENTER);
 
     // Lives
@@ -359,7 +356,8 @@ void updateGameSdl(Controller *controller) {
     SDL_RenderFillRect(rend, &headerBorderRect);
 
     // Player - with death animation
-    if (game->playerDeathFrame >= 0 && game->playerDeathFrame < PLAYER_DEATH_FRAMES) {
+    if (game->playerDeathFrame >= 0 &&
+        game->playerDeathFrame < PLAYER_DEATH_FRAMES) {
       // Show explosion for first half of animation
       if (game->playerDeathFrame < PLAYER_DEATH_FRAMES / 2) {
         float playerSizeX = 13 * scale;
@@ -422,8 +420,8 @@ void updateGameSdl(Controller *controller) {
             height * (UFO_HEIGHT_RATIO + 0.05) +
             game->aliens->aliensY * moveRangeY;
 
-        SDL_FRect alienRect = {alienX - alienSizeX / 2,
-                               alienY - alienSizeY / 2, alienSizeX, alienSizeY};
+        SDL_FRect alienRect = {alienX - alienSizeX / 2, alienY - alienSizeY / 2,
+                               alienSizeX, alienSizeY};
         SDL_RenderTexture(rend, alienTexture, NULL, &alienRect);
       }
     }
@@ -482,8 +480,7 @@ void updateGameSdl(Controller *controller) {
             (game->aliens->alienShotX[i] * GAME_WIDTH_RATIO + margin) * width -
             scale / 2;
         double alienShootY = game->aliens->alienShotY[i] * height - 2 * scale;
-        SDL_FRect alienShootRect = {alienShootX, alienShootY, scale,
-                                    4 * scale};
+        SDL_FRect alienShootRect = {alienShootX, alienShootY, scale, 4 * scale};
         SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
         SDL_RenderFillRect(rend, &alienShootRect);
       }

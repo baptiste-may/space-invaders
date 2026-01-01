@@ -27,9 +27,9 @@ Game *newGame(unsigned int nbAliens, unsigned int nbAlienRows,
                 aliens,
                 player,
                 (Shields){nbShields, shields},
-                0,
-                -1,  // playerDeathFrame
-                0,   // waveTransitionFrame
+                false,
+                -1,   // playerDeathFrame
+                0,    // waveTransitionFrame
                 1.0}; // currentAlienSpeed
 
   return res;
@@ -62,14 +62,14 @@ void nextFrame(Game *game) {
     if (game->waveTransitionFrame >= 30) { // 30 frames = 0.5 seconds
       // Increase speed for next wave (20% faster)
       game->currentAlienSpeed *= 1.2;
-      
+
       // Recreate aliens at the top with new speed
       freeAliens(game->aliens);
       game->aliens = createAliens(11, 5, game->currentAlienSpeed);
-      
+
       // Give bonus life to player
       game->player->lives++;
-      
+
       game->waveTransitionFrame = 0;
     }
     return;
@@ -77,13 +77,14 @@ void nextFrame(Game *game) {
 
   // Check if all aliens are dead
   bool allDead = true;
-  for (unsigned i = 0; i < game->aliens->nbAlienRows * game->aliens->nbAliens; i++) {
+  for (unsigned i = 0; i < game->aliens->nbAlienRows * game->aliens->nbAliens;
+       i++) {
     if (game->aliens->aliens[i] >= -EXPLOSION_FRAMES) {
       allDead = false;
       break;
     }
   }
-  
+
   if (allDead) {
     game->waveTransitionFrame = 1;
     return;
@@ -134,7 +135,7 @@ void nextFrame(Game *game) {
   if (!game->gameOver) {
     if (resolvePlayerHit(game->player, game->aliens)) {
       if (game->player->lives == 0) {
-        game->gameOver = 1;
+        game->gameOver = true;
       } else {
         // Start death animation
         game->playerDeathFrame = 0;
@@ -146,7 +147,7 @@ void nextFrame(Game *game) {
   if (game->frame == 0) {
     // Aliens positions
     if (moveAliens(game->aliens)) {
-      game->gameOver = 1;
+      game->gameOver = true;
     }
 
     alienShoot(game->aliens);

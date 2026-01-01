@@ -1,8 +1,10 @@
 #pragma once
+
 #include "aliens.h"
 #include "player.h"
 #include "score.h"
 #include "shield.h"
+#include <stdbool.h>
 
 /**
  * @def DEFAULT_FRAME_LENGTH
@@ -43,14 +45,16 @@ typedef struct {
                      //!< frameMax)
   unsigned frameMax; //!< The max number of frame
 
-  Scores scores;     //!< The scores structure
-  Aliens *aliens;    //!< The aliens structure
-  Player *player;    //!< The player structure
-  Shields shields;   //!< The shields structure
+  Scores scores;   //!< The scores structure
+  Aliens *aliens;  //!< The aliens structure
+  Player *player;  //!< The player structure
+  Shields shields; //!< The shields structure
 
-  int gameOver;      //!< Game over flag (0 = playing, 1 = game over)
-  int playerDeathFrame; //!< Frame counter for player death animation (-1 = not dying)
-  int waveTransitionFrame; //!< Frame counter for wave transition (0 = no transition)
+  bool gameOver;        //!< Game over flag (0 = playing, 1 = game over)
+  int playerDeathFrame; //!< Frame counter for player death animation (-1 = not
+                        //!< dying)
+  int waveTransitionFrame;  //!< Frame counter for wave transition (0 = no
+                            //!< transition)
   double currentAlienSpeed; //!< Current alien speed multiplier
 } Game;
 

@@ -8,7 +8,7 @@ int maxWidth, maxHeight;
 // Main Menu
 WINDOW *mainMenu = NULL;
 const char mainMenuTitle[] = "Space Invaders";
-const unsigned mainMenuWidth = 18, mainMenuHeight = 8;
+const unsigned mainMenuWidth = 18, mainMenuHeight = 7;
 
 // Game Window
 WINDOW *gameWin = NULL;
@@ -33,13 +33,10 @@ void updateMainMenuNcurses(Controller *controller) {
             gameWin == NULL ? "Play" : "Continue");
 
   wattrset(mainMenu, selected == 1 ? A_REVERSE : A_NORMAL);
-  mvwprintw(mainMenu, 3, 5, "Settings");
+  mvwprintw(mainMenu, 3, 6, "Credit");
 
   wattrset(mainMenu, selected == 2 ? A_REVERSE : A_NORMAL);
-  mvwprintw(mainMenu, 4, 6, "Credit");
-
-  wattrset(mainMenu, selected == 3 ? A_REVERSE : A_NORMAL);
-  mvwprintw(mainMenu, 5, 7, "Quit");
+  mvwprintw(mainMenu, 4, 7, "Quit");
 
   wattrset(mainMenu, A_NORMAL);
   wrefresh(mainMenu);

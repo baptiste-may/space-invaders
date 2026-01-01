@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../model/model.h"
+#include <stdbool.h>
 
 /**
  * @enum Event

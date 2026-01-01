@@ -3,10 +3,22 @@
 
 #include <ncurses.h>
 #include <stdbool.h>
+#include <stdio.h>
+
+bool handleMenuInput(Menu *menu, Event e) {
+  if (e & EVENT_KEY_ENTER)
+    return true;
+  if (e & EVENT_KEY_DOWN)
+    nextMenuElt(menu);
+  if (e & EVENT_KEY_UP)
+    previousMenuElt(menu);
+  return false;
+}
 
 void mainLoop(Controller *controller) {
   Model *model = controller->model;
-  MainMenu *mainMenu = &(model->mainMenu);
+  Menu *mainMenu = &(model->mainMenu);
+  Menu *gameOverMenu = &(model->gameOverMenu);
 
   bool closeApp = false;
   Event event;
@@ -22,7 +34,7 @@ void mainLoop(Controller *controller) {
     }
 
     if (mainMenu->isOpen == true) {
-      if (event & EVENT_KEY_ENTER) {
+      if (handleMenuInput(mainMenu, event)) {
         switch (mainMenu->selected) {
         case 0:
           // Play or Continue
@@ -34,22 +46,14 @@ void mainLoop(Controller *controller) {
           }
           break;
         case 1:
-          // Settings
-          break;
-        case 2:
           // About
           break;
-        case 3:
+        case 2:
           // Exit
           closeApp = true;
           break;
         }
-      } else if (event & EVENT_KEY_UP) {
-        mainMenu->selected--;
-        if (mainMenu->selected < 0)
-          mainMenu->selected = 3;
-      } else if (event & EVENT_KEY_DOWN)
-        mainMenu->selected = (mainMenu->selected + 1) % 4;
+      }
 
       updateMainMenu(controller);
       continue;
@@ -60,29 +64,22 @@ void mainLoop(Controller *controller) {
 
       // Handle game over menu
       if (game->gameOver) {
-        if (event & EVENT_KEY_UP) {
-          model->gameOverSelected = (model->gameOverSelected - 1 + 2) % 2;
-          updateGame(controller);
-        } else if (event & EVENT_KEY_DOWN) {
-          model->gameOverSelected = (model->gameOverSelected + 1) % 2;
-          updateGame(controller);
-        } else if (event & EVENT_KEY_ENTER) {
-          if (model->gameOverSelected == 0) {
+        if (handleMenuInput(gameOverMenu, event)) {
+          gameOverMenu->isOpen = false;
+          freeGame(model->currentGame);
+          model->currentGame = NULL;
+          if (gameOverMenu->selected == 0) {
             // Restart: create a new game
-            freeGame(model->currentGame);
             startGame(model);
-            model->gameOverSelected = 0;
             updateGame(controller);
           } else {
             // Main Menu: return to main menu
-            freeGame(model->currentGame);
-            model->currentGame = NULL;
-            model->gameOverSelected = 0;
-            createMainMenu(controller);
             mainMenu->isOpen = true;
+            createMainMenu(controller);
           }
+          gameOverMenu->selected = 0;
+          continue;
         }
-        continue;
       }
 
       // Normal gameplay

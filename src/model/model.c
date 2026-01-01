@@ -1,9 +1,9 @@
 #include "model.h"
 #include "game.h"
-#include "main-menu.h"
+#include "menu.h"
 #include <stdlib.h>
 
-Model newModel() { return (Model){NULL, (MainMenu){false, 0}}; }
+Model newModel() { return (Model){NULL, createMenu(3), createMenu(2)}; }
 
 void *startGame(Model *model) {
   model->currentGame = newGame(11, 5, 4);
