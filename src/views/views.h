@@ -22,6 +22,9 @@ typedef struct ViewInterface {
   void (*createMainMenu)(Controller *controller);
   void (*updateMainMenu)(Controller *controller);
   void (*destroyMainMenu)();
+  void (*createCreditsMenu)(Controller *controller);
+  void (*updateCreditsMenu)(Controller *controller);
+  void (*destroyCreditsMenu)();
   void (*createGame)(Controller *controller);
   void (*updateGame)(Controller *controller);
   void (*destroyGame)();

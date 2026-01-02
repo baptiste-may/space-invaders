@@ -12,10 +12,15 @@ WINDOW *mainMenu = NULL;
 const char mainMenuTitle[] = "Space Invaders";
 const unsigned mainMenuWidth = 18, mainMenuHeight = 7;
 
+// Credits Menu
+WINDOW *creditsMenu = NULL;
+const char creditsTitle[] = "Credits";
+const unsigned creditsWidth = 25, creditsHeight = 10;
+
 // Game over Menu
 WINDOW *gameOverMenu = NULL;
-const char gameOverTitle[] = "GAME OVER";
-const unsigned gameOverWidth = 18, gameOverHeight = 7;
+const char gameOverTitle[] = "GAME OVER !";
+const unsigned gameOverWidth = 31, gameOverHeight = 9;
 
 // Game Window
 WINDOW *gameWin = NULL;
@@ -26,6 +31,22 @@ static void destroyMainMenuNcurses() {
     wrefresh(mainMenu);
     delwin(mainMenu);
     mainMenu = NULL;
+    if (gameWin != NULL) {
+      touchwin(gameWin);
+      wrefresh(gameWin);
+    } else {
+      touchwin(stdscr);
+      refresh();
+    }
+  }
+}
+
+static void destroyCreditsMenuNcurses() {
+  if (creditsMenu != NULL) {
+    wclear(creditsMenu);
+    wrefresh(creditsMenu);
+    delwin(creditsMenu);
+    creditsMenu = NULL;
     if (gameWin != NULL) {
       touchwin(gameWin);
       wrefresh(gameWin);
@@ -76,6 +97,32 @@ static void updateMainMenuNcurses(Controller *controller) {
   wrefresh(mainMenu);
 }
 
+static void updateCreditsMenuNcurses(Controller *controller) {
+  unsigned selected = controller->model->creditsMenu.selected;
+
+  wclear(creditsMenu);
+  mvwin(creditsMenu, (maxHeight - creditsHeight) / 2,
+        (maxWidth - creditsWidth) / 2);
+  box(creditsMenu, 0, 0);
+  mvwprintw(creditsMenu, 0, (creditsWidth - strlen(creditsTitle)) / 2,
+            creditsTitle);
+
+  wattrset(creditsMenu, A_UNDERLINE);
+  mvwprintw(creditsMenu, 2, (creditsWidth - 8) / 2, "Made by:");
+  wattrset(creditsMenu, A_NORMAL);
+  mvwprintw(creditsMenu, 3, (creditsWidth - 12) / 2, "Baptiste MAY");
+  mvwprintw(creditsMenu, 4, (creditsWidth - 16) / 2, "Kamil CHARBENAGA");
+
+  wattrset(creditsMenu, selected == 0 ? A_REVERSE : A_NORMAL);
+  mvwprintw(creditsMenu, 6, (creditsWidth - 13) / 2, "See on github");
+
+  wattrset(creditsMenu, selected == 1 ? A_REVERSE : A_NORMAL);
+  mvwprintw(creditsMenu, 7, (creditsWidth - 4) / 2, "Exit");
+
+  wattrset(creditsMenu, A_NORMAL);
+  wrefresh(creditsMenu);
+}
+
 static void updateGameOverMenuNcurses(Controller *controller) {
   unsigned selected = controller->model->gameOverMenu.selected;
 
@@ -102,10 +149,10 @@ static void updateGameOverMenuNcurses(Controller *controller) {
             "Best Score: %d", scores.best);
 
   wattrset(gameOverMenu, selected == 0 ? A_REVERSE : A_NORMAL);
-  mvwprintw(gameOverMenu, 4, (gameOverWidth - 7) / 2, "Restart");
+  mvwprintw(gameOverMenu, 5, (gameOverWidth - 7) / 2, "Restart");
 
   wattrset(gameOverMenu, selected == 1 ? A_REVERSE : A_NORMAL);
-  mvwprintw(gameOverMenu, 5, (gameOverWidth - 9) / 2, "Main Menu");
+  mvwprintw(gameOverMenu, 6, (gameOverWidth - 9) / 2, "Main Menu");
 
   wattrset(gameOverMenu, A_NORMAL);
   wrefresh(gameWin);
@@ -119,6 +166,15 @@ static void createMainMenuNcurses(Controller *controller) {
       newwin(mainMenuHeight, mainMenuWidth, (maxHeight - mainMenuHeight) / 2,
              (maxWidth - mainMenuWidth) / 2);
   updateMainMenuNcurses(controller);
+}
+
+static void createCreditsMenuNcurses(Controller *controller) {
+  if (creditsMenu != NULL)
+    delwin(creditsMenu);
+  creditsMenu =
+      newwin(creditsHeight, creditsWidth, (maxHeight - creditsHeight) / 2,
+             (maxWidth - creditsWidth) / 2);
+  updateCreditsMenuNcurses(controller);
 }
 
 static void createGameOverMenuNcurses(Controller *controller) {
@@ -366,17 +422,12 @@ static void resizeNcurses(Controller *controller) {
 }
 
 ViewInterface getNcursesInterface() {
-  return (ViewInterface){initViewNcurses,
-                         closeViewNcurses,
-                         scanEventNcurses,
-                         createMainMenuNcurses,
-                         updateMainMenuNcurses,
-                         destroyMainMenuNcurses,
-                         createGameNcurses,
-                         updateGameNcurses,
-                         destroyGameNcurses,
-                         createGameOverMenuNcurses,
-                         updateGameOverMenuNcurses,
-                         destroyGameOverNcurses,
-                         resizeNcurses};
+  return (ViewInterface){initViewNcurses,           closeViewNcurses,
+                         scanEventNcurses,          createMainMenuNcurses,
+                         updateMainMenuNcurses,     destroyMainMenuNcurses,
+                         createCreditsMenuNcurses,  updateCreditsMenuNcurses,
+                         destroyCreditsMenuNcurses, createGameNcurses,
+                         updateGameNcurses,         destroyGameNcurses,
+                         createGameOverMenuNcurses, updateGameOverMenuNcurses,
+                         destroyGameOverNcurses,    resizeNcurses};
 }

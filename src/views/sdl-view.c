@@ -132,6 +132,37 @@ static void updateMainMenuSdl(Controller *controller) {
   SDL_RenderPresent(rend);
 }
 
+static void updateCreditsMenuSdl(Controller *controller) {
+  SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
+  SDL_RenderClear(rend);
+
+  renderGameElementsSdl(controller);
+
+  Model *model = controller->model;
+  int selected = model->creditsMenu.selected;
+
+  double winWidth = 400, winHeight = 350;
+  float boxX = (float)(width - winWidth) / 2;
+  float boxY = (float)(height - winHeight) / 2;
+  renderBox(winWidth, winHeight, boxX, boxY, 2);
+
+  renderText("Credits", boxX + (float)winWidth / 2, boxY + 40, white, CENTER);
+
+  renderText("Made by:", boxX + (float)winWidth / 2, boxY + 90, white, CENTER);
+  renderText("Baptiste MAY", boxX + (float)winWidth / 2, boxY + 130, white,
+             CENTER);
+  renderText("Kamil CHARBENAGA", boxX + (float)winWidth / 2, boxY + 170, white,
+             CENTER);
+
+  renderText("See on github", boxX + (float)winWidth / 2, boxY + 240,
+             selected == 0 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+
+  renderText("Exit", boxX + (float)winWidth / 2, boxY + 290,
+             selected == 1 ? white : (SDL_Color){128, 128, 128, 255}, CENTER);
+
+  SDL_RenderPresent(rend);
+}
+
 static void updateGameOverMenuSdl(Controller *controller) {
   SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
   SDL_RenderClear(rend);
@@ -172,6 +203,10 @@ static void updateGameOverMenuSdl(Controller *controller) {
 
 static void createMainMenuSdl(Controller *controller) {
   updateMainMenuSdl(controller);
+}
+
+static void createCreditsMenuSdl(Controller *controller) {
+  updateCreditsMenuSdl(controller);
 }
 
 static void createGameOverMenuSdl(Controller *controller) {
@@ -405,6 +440,7 @@ static void updateGameSdl(Controller *controller) {
 static void createGameSdl(Controller *controller) { updateGameSdl(controller); }
 
 static void destroyMainMenuSdl() {}
+static void destroyCreditsMenuSdl() {}
 static void destroyGameOverMenuSdl() {}
 static void destroyGameSdl() {}
 
@@ -546,6 +582,9 @@ ViewInterface getSdlInterface() {
                          createMainMenuSdl,
                          updateMainMenuSdl,
                          destroyMainMenuSdl,
+                         createCreditsMenuSdl,
+                         updateCreditsMenuSdl,
+                         destroyCreditsMenuSdl,
                          createGameSdl,
                          updateGameSdl,
                          destroyGameSdl,

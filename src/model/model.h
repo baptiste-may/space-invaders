@@ -10,6 +10,7 @@
 typedef struct {
   Game *currentGame; //!< The current game, NULL if none
   Menu mainMenu;     //!< The informations about the main menu
+  Menu creditsMenu;  //!< The informations about the credits menu
   Menu gameOverMenu; //!< The informations about the game over menu
 } Model;
 

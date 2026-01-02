@@ -3,6 +3,8 @@
 
 #include <ncurses.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 bool handleMenuInput(Menu *menu, Event e) {
@@ -18,6 +20,7 @@ bool handleMenuInput(Menu *menu, Event e) {
 void mainLoop(Controller *controller) {
   Model *model = controller->model;
   Menu *mainMenu = &(model->mainMenu);
+  Menu *creditsMenu = &(model->creditsMenu);
   Menu *gameOverMenu = &(model->gameOverMenu);
 
   bool closeApp = false;
@@ -30,6 +33,22 @@ void mainLoop(Controller *controller) {
 
     if (event & EVENT_CLOSE) {
       closeApp = true;
+      continue;
+    }
+
+    if (creditsMenu->isOpen) {
+      if (handleMenuInput(creditsMenu, event)) {
+        if (creditsMenu->selected == 0)
+          system("xdg-open https://github.com/baptiste-may/space-invaders");
+        else {
+          controller->view->destroyCreditsMenu();
+          creditsMenu->isOpen = false;
+          controller->view->createMainMenu(controller);
+          mainMenu->selected = 0;
+          mainMenu->isOpen = true;
+        }
+      }
+      controller->view->updateCreditsMenu(controller);
       continue;
     }
 
@@ -47,6 +66,11 @@ void mainLoop(Controller *controller) {
           break;
         case 1:
           // About
+          controller->view->destroyMainMenu();
+          mainMenu->isOpen = false;
+          controller->view->createCreditsMenu(controller);
+          creditsMenu->selected = 0;
+          creditsMenu->isOpen = true;
           break;
         case 2:
           // Exit
@@ -74,6 +98,7 @@ void mainLoop(Controller *controller) {
           // Main Menu : return to the main menu
           controller->view->destroyGame();
           controller->view->createMainMenu(controller);
+          mainMenu->selected = 0;
           mainMenu->isOpen = true;
         }
       }
@@ -86,11 +111,13 @@ void mainLoop(Controller *controller) {
     if (game != NULL) {
       if (game->gameOver) {
         controller->view->createGameOverMenu(controller);
+        gameOverMenu->selected = 0;
         gameOverMenu->isOpen = true;
         continue;
       }
       if (event & EVENT_KEY_ESCAPE) {
         controller->view->createMainMenu(controller);
+        mainMenu->selected = 0;
         mainMenu->isOpen = true;
       } else {
         // Block all inputs if player is exploding
