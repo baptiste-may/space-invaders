@@ -18,15 +18,19 @@ TARGET ?= $(OBJ_DIR)/main
 
 all: $(TARGET)
 
+.PHONY: run-ncurses
 run-ncurses: $(TARGET)
 	@LD_LIBRARY_PATH=$(LD_LIB) ./$(TARGET) ncurses
 
+.PHONY: run-sdl
 run-sdl: $(TARGET)
 	@LD_LIBRARY_PATH=$(LD_LIB) ./$(TARGET) sdl
 
+.PHONY: valgrind
 valgrind: $(TARGET)
 	@LD_LIBRARY_PATH=$(LD_LIB) valgrind ./$(TARGET) ncurses
 
+.PHONY: doc
 doc:
 	doxygen
 
