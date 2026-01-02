@@ -36,6 +36,7 @@ SDL_Texture *playerTexture = NULL;
 SDL_Texture *aliensTextures[4][2];
 SDL_Texture *ufoTexture = NULL;
 SDL_Texture *explosionTexture = NULL;
+SDL_Texture *shootTextures[NB_SHOOT_SPRITE];
 
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color black = {0, 0, 0, 255};
@@ -414,17 +415,25 @@ static void renderGameElementsSdl(Controller *controller) {
       SDL_RenderFillRect(rend, &shootRect);
     }
 
-    // Alien shots
-    for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
-      if (game->aliens->alienShotActive[i]) {
+    // Alien shoots
+    for (int i = 0; i < MAX_ALIEN_SHOOTS; i++) {
+      if (game->aliens->alienShootStatus[i]) {
         // Align visual alien shoot position with logical position
         double alienShootX =
-            (game->aliens->alienShotX[i] * GAME_WIDTH_RATIO + margin) * width -
-            scale / 2;
-        double alienShootY = game->aliens->alienShotY[i] * height - 2 * scale;
-        SDL_FRect alienShootRect = {alienShootX, alienShootY, scale, 4 * scale};
-        SDL_SetRenderDrawColor(rend, 255, 0, 0, 255);
-        SDL_RenderFillRect(rend, &alienShootRect);
+            (game->aliens->alienShootX[i] * GAME_WIDTH_RATIO + margin) * width;
+        double alienShootY = game->aliens->alienShootY[i] * height;
+
+        SDL_Texture *shootTexture =
+            shootTextures[game->aliens->alienShootStatus[i] - 1];
+        float shootSizeX, shootSizeY;
+        SDL_GetTextureSize(shootTexture, &shootSizeX, &shootSizeY);
+        shootSizeX *= scale;
+        shootSizeY *= scale;
+
+        SDL_FRect alienShootRect = {alienShootX - shootSizeX / 2,
+                                    alienShootY - shootSizeY / 2, shootSizeX,
+                                    shootSizeY};
+        SDL_RenderTexture(rend, shootTexture, NULL, &alienShootRect);
       }
     }
   }
@@ -444,33 +453,31 @@ static void destroyCreditsMenuSdl() {}
 static void destroyGameOverMenuSdl() {}
 static void destroyGameSdl() {}
 
+static void checkSdlError(void *obj, const char *errMsg) {
+  if (obj == NULL) {
+    fprintf(stderr, "%s: %s", errMsg, SDL_GetError());
+    closeViewSdl();
+    exit(EXIT_FAILURE);
+  }
+}
+
 static void initViewSdl(Controller *controller) {
   if (SDL_Init(SDL_INIT_VIDEO) == false) {
     fprintf(stderr, "Cannot initialize SDL: %s\n", SDL_GetError());
     exit(EXIT_FAILURE);
   }
 
+  // Create main window
   win = SDL_CreateWindow("Space Invaders", WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE);
-  if (win == NULL) {
-    fprintf(stderr, "Cannot create window: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
+  checkSdlError(win, "Cannot create window");
 
+  // Create render based on the main window
   rend = SDL_CreateRenderer(win, NULL);
-  if (rend == NULL) {
-    fprintf(stderr, "Cannot create renderer: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
+  checkSdlError(rend, "Cannot create renderer");
 
   // Load player texture
   playerTexture = IMG_LoadTexture(rend, "assets/player.png");
-  if (playerTexture == NULL) {
-    fprintf(stderr, "Cannot load player texture: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
+  checkSdlError(playerTexture, "Cannot load player texture");
   SDL_SetTextureScaleMode(playerTexture, SDL_SCALEMODE_NEAREST);
 
   // Load aliens textures
@@ -481,47 +488,47 @@ static void initViewSdl(Controller *controller) {
         sprintf(imagePath, "assets/alien%u-%u.png", i, j);
       else
         sprintf(imagePath, "assets/alien4.png");
-      aliensTextures[i - 1][j - 1] = IMG_LoadTexture(rend, imagePath);
-      if (aliensTextures[i - 1][j - 1] == NULL) {
-        fprintf(stderr, "Cannot load alien n°%u with texture n°%u: %s", i, j,
-                SDL_GetError());
-        closeViewSdl();
-        exit(EXIT_FAILURE);
-      }
-      SDL_SetTextureScaleMode(aliensTextures[i - 1][j - 1],
-                              SDL_SCALEMODE_NEAREST);
+      SDL_Texture *texture = IMG_LoadTexture(rend, imagePath);
+      char errorMsg[50];
+      sprintf(errorMsg, "Cannot load alien n°%u with texture n°%u", i, j);
+      checkSdlError(texture, errorMsg);
+      SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+      aliensTextures[i - 1][j - 1] = texture;
     }
   }
 
   // Load UFO texture
   ufoTexture = IMG_LoadTexture(rend, "assets/alien4.png");
-  if (ufoTexture == NULL) {
-    fprintf(stderr, "Cannot load UFO texture: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
+  checkSdlError(ufoTexture, "Cannot load UFO texture");
   SDL_SetTextureScaleMode(ufoTexture, SDL_SCALEMODE_NEAREST);
 
+  // Load explosion texture
   explosionTexture = IMG_LoadTexture(rend, "assets/explosion.png");
-  if (explosionTexture == NULL) {
-    fprintf(stderr, "Cannot load explosion texture: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
+  checkSdlError(explosionTexture, "Cannot load explosion texture");
   SDL_SetTextureScaleMode(explosionTexture, SDL_SCALEMODE_NEAREST);
 
+  // Load shoot textures
+  for (unsigned i = 1; i <= NB_SHOOT_SPRITE; i++) {
+    char imgPath[20];
+    sprintf(imgPath, "assets/shoot-%u.png", i);
+    SDL_Texture *texture = IMG_LoadTexture(rend, imgPath);
+    char errorMsg[50];
+    sprintf(errorMsg, "Cannot load shoot texture n°%u", i);
+    checkSdlError(texture, errorMsg);
+    SDL_SetTextureScaleMode(texture, SDL_SCALEMODE_NEAREST);
+    shootTextures[i - 1] = texture;
+  }
+
+  // Load ttf module (for fonts)
   if (TTF_Init() == false) {
     fprintf(stderr, "Cannot initialize TTF: %s", SDL_GetError());
     closeViewSdl();
     exit(EXIT_FAILURE);
   }
 
+  // Load editundo font
   font = TTF_OpenFont("assets/editundo.ttf", FONT_SIZE);
-  if (font == NULL) {
-    fprintf(stderr, "Cannot load font: %s", SDL_GetError());
-    closeViewSdl();
-    exit(EXIT_FAILURE);
-  }
+  checkSdlError(font, "Cannot load font");
 
   SDL_RenderClear(rend);
   SDL_RenderPresent(rend);

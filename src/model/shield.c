@@ -89,11 +89,11 @@ void damageShield(Shield shield, int x, int y) {
   }
 }
 
-bool checkShieldCollision(Shields *shields, double shotX, double shotY) {
-  // shotX is in GAME_WIDTH_RATIO space (0.0 to 1.0 in the game area)
+bool checkShieldCollision(Shields *shields, double shootX, double shootY) {
+  // shootX is in GAME_WIDTH_RATIO space (0.0 to 1.0 in the game area)
   // It needs to be converted to full screen space (0.0 to 1.0)
   const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
-  const double shotXScreen = shotX * GAME_WIDTH_RATIO + margin;
+  const double shootXScreen = shootX * GAME_WIDTH_RATIO + margin;
 
   // Y position of shields
   const double shieldsY = 1.0 - PLAYER_HEIGHT_RATIO - SHIELD_HEIGHT_RATIO / 2.0;
@@ -109,7 +109,7 @@ bool checkShieldCollision(Shields *shields, double shotX, double shotY) {
   const double halfHitW = shieldWidthRatio / 2.0;
 
   // Check height
-  if (fabs(shotY - shieldsY) >= halfHitH) {
+  if (fabs(shootY - shieldsY) >= halfHitH) {
     return false;
   }
 
@@ -119,12 +119,12 @@ bool checkShieldCollision(Shields *shields, double shotX, double shotY) {
     const double shieldCenterX = shieldSectionWidth * (n + 0.5);
 
     // Check if in X zone
-    if (fabs(shotXScreen - shieldCenterX) < halfHitW) {
+    if (fabs(shootXScreen - shieldCenterX) < halfHitW) {
 
       // Convert to block coordinates
       double relativeX =
-          (shotXScreen - (shieldCenterX - halfHitW)) / shieldWidthRatio;
-      double relativeY = (shotY - (shieldsY - halfHitH)) / shieldHeightRatio;
+          (shootXScreen - (shieldCenterX - halfHitW)) / shieldWidthRatio;
+      double relativeY = (shootY - (shieldsY - halfHitH)) / shieldHeightRatio;
 
       int blockX = (int)(relativeX * SHIELD_WIDTH);
       int blockY = (int)(relativeY * SHIELD_HEIGHT);

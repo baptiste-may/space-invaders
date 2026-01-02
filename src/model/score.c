@@ -1,6 +1,5 @@
 #include "score.h"
 #include <stdio.h>
-#include <stdlib.h>
 
 unsigned getBestScore() {
   FILE *file = fopen(BEST_SCORE_FILE, "r");
@@ -10,7 +9,7 @@ unsigned getBestScore() {
   char c;
   unsigned res = 0;
   while ((c = fgetc(file)) != EOF) {
-    if (c >= '0' && c <= '9') { 
+    if (c >= '0' && c <= '9') {
       res *= 10;
       res += (c - '0');
     }

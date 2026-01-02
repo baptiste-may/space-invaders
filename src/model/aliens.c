@@ -8,7 +8,8 @@
 static const int UFO_POINTS[] = {100, 50,  50,  100, 150, 100, 100, 50,
                                  300, 100, 100, 100, 50,  150, 100, 50};
 
-Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows, double speedMultiplier) {
+Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows,
+                     double speedMultiplier) {
   Aliens *res = (Aliens *)malloc(sizeof(Aliens));
   if (res == NULL) {
     perror("Allocation error");
@@ -33,17 +34,17 @@ Aliens *createAliens(unsigned nbAliens, unsigned nbAlienRows, double speedMultip
     }
   }
 
-  for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
-    res->alienShotActive[i] = false;
-    res->alienShotX[i] = -1;
-    res->alienShotY[i] = -1;
+  for (int i = 0; i < MAX_ALIEN_SHOOTS; i++) {
+    res->alienShootStatus[i] = 0;
+    res->alienShootX[i] = -1;
+    res->alienShootY[i] = -1;
   }
 
   // UFO initialization
   res->ufoActive = false;
   res->ufoX = -1;
   res->ufoDirection = 1;
-  res->shotCounter = 0;
+  res->shootCounter = 0;
 
   return res;
 }
@@ -93,14 +94,14 @@ void alienShoot(Aliens *aliens) {
 
       double randVal = (double)rand() / RAND_MAX;
       if (randVal < ALIEN_SHOOT_PROBABILITY) {
-        for (int s = 0; s < MAX_ALIEN_SHOTS; s++) {
-          if (!aliens->alienShotActive[s]) {
+        for (int s = 0; s < MAX_ALIEN_SHOOTS; s++) {
+          if (!aliens->alienShootStatus[s]) {
             double alienX = alienStepX * j + alienBaseX;
             double alienY = rowHeight * (i + 0.5) + alienBaseY;
 
-            aliens->alienShotX[s] = (alienX - margin) / GAME_WIDTH_RATIO;
-            aliens->alienShotY[s] = alienY;
-            aliens->alienShotActive[s] = true;
+            aliens->alienShootX[s] = (alienX - margin) / GAME_WIDTH_RATIO;
+            aliens->alienShootY[s] = alienY;
+            aliens->alienShootStatus[s] = (rand() % NB_SHOOT_SPRITE) + 1;
 
             break;
           }
@@ -110,24 +111,24 @@ void alienShoot(Aliens *aliens) {
   }
 }
 
-void updateAlienShots(Aliens *aliens, Shields *shields) {
-  for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
-    if (aliens->alienShotActive[i]) {
-      aliens->alienShotY[i] += ALIEN_SHOOT_SPEED;
+void updateAlienShoots(Aliens *aliens, Shields *shields) {
+  for (int i = 0; i < MAX_ALIEN_SHOOTS; i++) {
+    if (aliens->alienShootStatus[i]) {
+      aliens->alienShootY[i] += ALIEN_SHOOT_SPEED;
 
       // Check collision with shields
-      if (checkShieldCollision(shields, aliens->alienShotX[i],
-                               aliens->alienShotY[i])) {
-        aliens->alienShotActive[i] = false;
-        aliens->alienShotX[i] = -1;
-        aliens->alienShotY[i] = -1;
+      if (checkShieldCollision(shields, aliens->alienShootX[i],
+                               aliens->alienShootY[i])) {
+        aliens->alienShootStatus[i] = 0;
+        aliens->alienShootX[i] = -1;
+        aliens->alienShootY[i] = -1;
         continue;
       }
 
-      if (aliens->alienShotY[i] > 1.0) {
-        aliens->alienShotActive[i] = false;
-        aliens->alienShotX[i] = -1;
-        aliens->alienShotY[i] = -1;
+      if (aliens->alienShootY[i] > 1.0) {
+        aliens->alienShootStatus[i] = 0;
+        aliens->alienShootX[i] = -1;
+        aliens->alienShootY[i] = -1;
       }
     }
   }
@@ -169,17 +170,17 @@ void updateUFO(Aliens *aliens) {
   }
 }
 
-void incrementShotCounter(Aliens *aliens) {
-  aliens->shotCounter = (aliens->shotCounter + 1) % 15;
+void incrementShootCounter(Aliens *aliens) {
+  aliens->shootCounter = (aliens->shootCounter + 1) % 15;
 }
 
-int resolveUFOHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
-  if (!aliens->ufoActive || shotX_norm == -1)
+int resolveUFOHit(Aliens *aliens, double shootX_norm, double shootY_norm) {
+  if (!aliens->ufoActive || shootX_norm == -1)
     return 0;
 
   const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
-  const double shotX = shotX_norm * GAME_WIDTH_RATIO + margin;
-  const double shotY = shotY_norm;
+  const double shootX = shootX_norm * GAME_WIDTH_RATIO + margin;
+  const double shootY = shootY_norm;
 
   const double ufoX = aliens->ufoX;
   const double ufoY = UFO_HEIGHT_RATIO;
@@ -187,22 +188,22 @@ int resolveUFOHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
   const double halfHitW = 0.04;
   const double halfHitH = 0.02;
 
-  if (fabs(shotX - ufoX) < halfHitW && fabs(shotY - ufoY) < halfHitH) {
+  if (fabs(shootX - ufoX) < halfHitW && fabs(shootY - ufoY) < halfHitH) {
     aliens->ufoActive = false;
     aliens->ufoX = -1;
-    return UFO_POINTS[aliens->shotCounter];
+    return UFO_POINTS[aliens->shootCounter];
   }
 
   return 0;
 }
 
-int resolveAlienHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
-  if (shotX_norm == -1 || shotY_norm < UFO_HEIGHT_RATIO + 0.05)
+int resolveAlienHit(Aliens *aliens, double shootX_norm, double shootY_norm) {
+  if (shootX_norm == -1 || shootY_norm < UFO_HEIGHT_RATIO + 0.05)
     return 0;
 
   const double margin = (1.0 - GAME_WIDTH_RATIO) / 2.0;
-  const double shotX = shotX_norm * GAME_WIDTH_RATIO + margin;
-  const double shotY = shotY_norm;
+  const double shootX = shootX_norm * GAME_WIDTH_RATIO + margin;
+  const double shootY = shootY_norm;
 
   const double gridHeight = ALIENS_HEIGHT_RATIO * ALIENS_GRID_HEIGHT_RATIO;
   const double moveRangeY =
@@ -226,7 +227,7 @@ int resolveAlienHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
 
   for (unsigned i = 0; i < aliens->nbAlienRows; i++) {
     double alienY = rowHeight * (i + 0.5) + alienBaseY;
-    if (fabs(shotY - alienY) >= halfHitH)
+    if (fabs(shootY - alienY) >= halfHitH)
       continue;
 
     for (unsigned j = 0; j < aliens->nbAliens; j++) {
@@ -236,7 +237,7 @@ int resolveAlienHit(Aliens *aliens, double shotX_norm, double shotY_norm) {
 
       double alienX = alienStepX * j + alienBaseX;
 
-      if (fabs(shotX - alienX) < halfHitW) {
+      if (fabs(shootX - alienX) < halfHitW) {
         int alienType = aliens->aliens[k] / 2;
         aliens->aliens[k] = -1;
         return (alienType + 1) * 10;

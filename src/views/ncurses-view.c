@@ -324,13 +324,13 @@ static void updateGameNcurses(Controller *controller) {
       }
     }
 
-    // Alien shots
-    for (int i = 0; i < MAX_ALIEN_SHOTS; i++) {
-      if (game->aliens->alienShotActive[i]) {
+    // Alien shoots
+    for (int i = 0; i < MAX_ALIEN_SHOOTS; i++) {
+      if (game->aliens->alienShootStatus[i]) {
         double alienShootX =
-            (game->aliens->alienShotX[i] * GAME_WIDTH_RATIO + margin) *
+            (game->aliens->alienShootX[i] * GAME_WIDTH_RATIO + margin) *
             maxWidth;
-        double alienShootY = game->aliens->alienShotY[i] * maxHeight;
+        double alienShootY = game->aliens->alienShootY[i] * maxHeight;
         mvwprintw(gameWin, alienShootY, alienShootX, "|");
       }
     }

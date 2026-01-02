@@ -95,7 +95,7 @@ void nextFrame(Game *game) {
 
   // Handle player shooting
   if (game->player->shootX != -1 && game->player->shootY >= 0) {
-    updatePlayerShot(game->player, &game->shields);
+    updatePlayerShoot(game->player, &game->shields);
 
     // Check collision with UFO
     int ufoPoints =
@@ -128,8 +128,8 @@ void nextFrame(Game *game) {
   // Update alien animations
   animateAliens(game->aliens, game->frame == 0);
 
-  // Update alien shots
-  updateAlienShots(game->aliens, &game->shields);
+  // Update alien shoots
+  updateAlienShoots(game->aliens, &game->shields);
 
   // Check if player is hit
   if (!game->gameOver) {

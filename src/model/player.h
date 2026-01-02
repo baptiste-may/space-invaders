@@ -88,20 +88,20 @@ void playerMoveRight(Player *player);
  * @brief Shoot if possible
  *
  * @param player The player structure
- * @param aliens The aliens structure (for UFO shot counter)
+ * @param aliens The aliens structure (for UFO shoot counter)
  */
 void playerFire(Player *player, Aliens *aliens);
 
 /**
- * @brief Update player shot position
+ * @brief Update player shoot position
  *
  * @param player The player structure
  * @param shields The shields structure
  */
-void updatePlayerShot(Player *player, Shields *shields);
+void updatePlayerShoot(Player *player, Shields *shields);
 
 /**
- * @brief Check if the player is hit by any alien shot
+ * @brief Check if the player is hit by any alien shoot
  *
  * @param player The player structure
  * @param aliens The aliens structure
