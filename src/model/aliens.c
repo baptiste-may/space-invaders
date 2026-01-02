@@ -85,6 +85,9 @@ void alienShoot(Aliens *aliens) {
   const double alienBaseY =
       UFO_HEIGHT_RATIO + 0.05 + aliens->aliensY * moveRangeY;
 
+  // Iterate over all aliens to determine if they shoot.
+  // Note: Even if multiple aliens 'decide' to shoot based on probability,
+  // we are limited by MAX_ALIEN_SHOOTS slots.
   for (unsigned i = 0; i < aliens->nbAlienRows; i++) {
     for (unsigned j = 0; j < aliens->nbAliens; j++) {
       unsigned k = j + i * aliens->nbAliens;
@@ -214,6 +217,8 @@ int resolveAlienHit(Aliens *aliens, double shootX_norm, double shootY_norm) {
   const double halfHitH =
       (ALIEN_HITBOX_HEIGHT_RATIO * gridHeight) / aliens->nbAlienRows / 2.0;
 
+  // We recalculate alien positions here instead of storing them to save memory.
+  // We determine the current X position of the alien group based on the sway factor.
   const double alienStepX = GAME_WIDTH_RATIO / aliens->nbAliens;
   const double alienBaseX =
       margin + (GAME_WIDTH_RATIO * 0.5) / aliens->nbAliens +

@@ -39,6 +39,11 @@ void freeShields(Shields *shields) {
     free(shields->blocks);
 }
 
+/**
+ * @brief Apply damage to a single shield block
+ *
+ * @param block The block to damage
+ */
 static void damageBlock(ShieldBlock *block) {
   switch (*block) {
   case EMPTY:

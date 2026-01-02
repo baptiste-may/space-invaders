@@ -43,6 +43,12 @@ void freeGame(Game *game) {
 }
 
 void nextFrame(Game *game) {
+  // Update Priority:
+  // 1. Player Death Animation (freezes game flow)
+  // 2. Wave Transition (fast forward between levels)
+  // 3. Game Over Check
+  // 4. Normal Game Logic (UFO, Player, Aliens, Collisions)
+
   // Handle player death animation - freeze everything
   if (game->playerDeathFrame >= 0) {
     game->playerDeathFrame++;

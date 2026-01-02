@@ -6,6 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @brief Handle input for a menu
+ *
+ * @param menu The menu to control
+ * @param e The event to process
+ * @return true if an option was selected (Enter key), false otherwise
+ */
 bool handleMenuInput(Menu *menu, Event e) {
   if (e & EVENT_KEY_ENTER)
     return true;
@@ -35,6 +42,8 @@ void mainLoop(Controller *controller) {
       continue;
     }
 
+    // --- State: Credits Menu ---
+    // Handle input for the credits menu and transitions back to main menu
     if (creditsMenu->isOpen) {
       if (handleMenuInput(creditsMenu, event)) {
         if (creditsMenu->selected == 0)
@@ -51,6 +60,8 @@ void mainLoop(Controller *controller) {
       continue;
     }
 
+    // --- State: Main Menu ---
+    // Handle main menu selections: Play, Credits, or Exit
     if (mainMenu->isOpen) {
       if (handleMenuInput(mainMenu, event)) {
         switch (mainMenu->selected) {
@@ -82,7 +93,8 @@ void mainLoop(Controller *controller) {
       continue;
     }
 
-    // Handle game over menu
+    // --- State: Game Over Menu ---
+    // Display game over screen and handle restart or return to main menu
     if (gameOverMenu->isOpen) {
       if (handleMenuInput(gameOverMenu, event)) {
         controller->view->destroyGameOverMenu();
@@ -106,6 +118,8 @@ void mainLoop(Controller *controller) {
       continue;
     }
 
+    // --- State: Gameplay ---
+    // Handle actual game logic: movement, shooting, and pause/escape
     Game *game = model->currentGame;
     if (game != NULL) {
       if (game->gameOver) {

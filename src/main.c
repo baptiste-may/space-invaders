@@ -4,6 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/**
+ * @brief Main entry point of the application
+ *
+ * @param argc Number of arguments
+ * @param args Array of arguments
+ * @return EXIT_SUCCESS or EXIT_FAILURE
+ */
 int main(int argc, char **args) {
   if (argc < 2) {
     printf("Not enough arguments\n");

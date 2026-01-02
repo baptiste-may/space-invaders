@@ -41,8 +41,16 @@ SDL_Texture *shootTextures[NB_SHOOT_SPRITE];
 SDL_Color white = {255, 255, 255, 255};
 SDL_Color black = {0, 0, 0, 255};
 
+/**
+ * @brief Render the game elements (player, aliens, etc.)
+ *
+ * @param controller The controller containing the model
+ */
 static void renderGameElementsSdl(Controller *controller);
 
+/**
+ * @brief Close the SDL view and cleanup
+ */
 static void closeViewSdl() {
   if (font != NULL)
     TTF_CloseFont(font);
@@ -66,11 +74,25 @@ static void closeViewSdl() {
   SDL_Quit();
 }
 
+/**
+ * @brief Handle resize events for SDL
+ *
+ * @param controller The controller
+ */
 static void resizeSdl(Controller *controller) {
   SDL_GetWindowSize(win, &width, &height);
   scale = (double)(width) / 640 + (double)(height) / 480;
 }
 
+/**
+ * @brief Render text on the screen
+ *
+ * @param text The text to render
+ * @param x The x coordinate
+ * @param y The y coordinate
+ * @param color The color of the text
+ * @param textAlign The alignment of the text
+ */
 static void renderText(const char *text, float x, float y, SDL_Color color,
                        TextAlign textAlign) {
   int text_width, text_height;
@@ -94,6 +116,15 @@ static void renderText(const char *text, float x, float y, SDL_Color color,
   SDL_DestroySurface(surface);
 }
 
+/**
+ * @brief Render a box with an outline
+ *
+ * @param boxWidth Width of the box
+ * @param boxHeight Height of the box
+ * @param boxX X coordinate of the top-left corner
+ * @param boxY Y coordinate of the top-left corner
+ * @param boxOutline Thickness of the outline
+ */
 static void renderBox(float boxWidth, float boxHeight, float boxX, float boxY,
                       float boxOutline) {
   SDL_FRect bgOutline = {boxX - boxOutline, boxY - boxOutline,
@@ -105,6 +136,11 @@ static void renderBox(float boxWidth, float boxHeight, float boxX, float boxY,
   SDL_RenderFillRect(rend, &bg);
 }
 
+/**
+ * @brief Update and draw the main menu
+ *
+ * @param controller The controller containing the model
+ */
 static void updateMainMenuSdl(Controller *controller) {
   SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
   SDL_RenderClear(rend);
@@ -133,6 +169,11 @@ static void updateMainMenuSdl(Controller *controller) {
   SDL_RenderPresent(rend);
 }
 
+/**
+ * @brief Update and draw the credits menu
+ *
+ * @param controller The controller containing the model
+ */
 static void updateCreditsMenuSdl(Controller *controller) {
   SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
   SDL_RenderClear(rend);
@@ -164,6 +205,11 @@ static void updateCreditsMenuSdl(Controller *controller) {
   SDL_RenderPresent(rend);
 }
 
+/**
+ * @brief Update and draw the game over menu
+ *
+ * @param controller The controller containing the model
+ */
 static void updateGameOverMenuSdl(Controller *controller) {
   SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
   SDL_RenderClear(rend);
@@ -202,18 +248,40 @@ static void updateGameOverMenuSdl(Controller *controller) {
   SDL_RenderPresent(rend);
 }
 
+/**
+ * @brief Create the main menu (wrapper for update)
+ *
+ * @param controller The controller containing the model
+ */
 static void createMainMenuSdl(Controller *controller) {
   updateMainMenuSdl(controller);
 }
 
+/**
+ * @brief Create the credits menu (wrapper for update)
+ *
+ * @param controller The controller containing the model
+ */
 static void createCreditsMenuSdl(Controller *controller) {
   updateCreditsMenuSdl(controller);
 }
 
+/**
+ * @brief Create the game over menu (wrapper for update)
+ *
+ * @param controller The controller containing the model
+ */
 static void createGameOverMenuSdl(Controller *controller) {
   updateGameOverMenuSdl(controller);
 }
 
+/**
+ * @brief Render a single shield block
+ *
+ * @param x X coordinate
+ * @param y Y coordinate
+ * @param block The block type to render
+ */
 static void renderShieldBlock(double x, double y, ShieldBlock block) {
   SDL_SetRenderDrawColor(rend, 0, 255, 0, 255);
   const double pixelSize = scale;
@@ -268,11 +336,19 @@ static void renderShieldBlock(double x, double y, ShieldBlock block) {
     SDL_RenderFillRect(rend, &bottomRight);
 }
 
+/**
+ * @brief Render the game elements (player, aliens, etc.)
+ *
+ * @param controller The controller containing the model
+ */
 static void renderGameElementsSdl(Controller *controller) {
   Model *model = controller->model;
 
   if (model->currentGame != NULL) {
     Game *game = model->currentGame;
+
+    // All logical coordinates (0.0 to 1.0) must be scaled to screen dimensions (width, height).
+    // GAME_WIDTH_RATIO handles the horizontal padding of the game area.
 
     // Just try a buffer instead of dynamics, for score, best score and live.
     // Score
@@ -439,6 +515,11 @@ static void renderGameElementsSdl(Controller *controller) {
   }
 }
 
+/**
+ * @brief Update and draw the game
+ *
+ * @param controller The controller containing the model
+ */
 static void updateGameSdl(Controller *controller) {
   SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
   SDL_RenderClear(rend);
@@ -446,13 +527,36 @@ static void updateGameSdl(Controller *controller) {
   SDL_RenderPresent(rend);
 }
 
+/**
+ * @brief Create the game (wrapper for update)
+ *
+ * @param controller The controller containing the model
+ */
 static void createGameSdl(Controller *controller) { updateGameSdl(controller); }
 
+/**
+ * @brief Destroy the main menu (no-op in SDL)
+ */
 static void destroyMainMenuSdl() {}
+/**
+ * @brief Destroy the credits menu (no-op in SDL)
+ */
 static void destroyCreditsMenuSdl() {}
+/**
+ * @brief Destroy the game over menu (no-op in SDL)
+ */
 static void destroyGameOverMenuSdl() {}
+/**
+ * @brief Destroy the game (no-op in SDL)
+ */
 static void destroyGameSdl() {}
 
+/**
+ * @brief Check for SDL errors and exit if one occurs
+ *
+ * @param obj The object to check (NULL indicates error)
+ * @param errMsg The error message to print
+ */
 static void checkSdlError(void *obj, const char *errMsg) {
   if (obj == NULL) {
     fprintf(stderr, "%s: %s", errMsg, SDL_GetError());
@@ -461,6 +565,11 @@ static void checkSdlError(void *obj, const char *errMsg) {
   }
 }
 
+/**
+ * @brief Initialize the SDL view
+ *
+ * @param controller The controller
+ */
 static void initViewSdl(Controller *controller) {
   if (SDL_Init(SDL_INIT_VIDEO) == false) {
     fprintf(stderr, "Cannot initialize SDL: %s\n", SDL_GetError());
@@ -474,6 +583,8 @@ static void initViewSdl(Controller *controller) {
   // Create render based on the main window
   rend = SDL_CreateRenderer(win, NULL);
   checkSdlError(rend, "Cannot create renderer");
+
+  // --- Texture Loading ---
 
   // Load player texture
   playerTexture = IMG_LoadTexture(rend, "assets/player.png");
@@ -519,6 +630,8 @@ static void initViewSdl(Controller *controller) {
     shootTextures[i - 1] = texture;
   }
 
+  // --- Font Initialization ---
+
   // Load ttf module (for fonts)
   if (TTF_Init() == false) {
     fprintf(stderr, "Cannot initialize TTF: %s", SDL_GetError());
@@ -538,6 +651,11 @@ static void initViewSdl(Controller *controller) {
   createMainMenuSdl(controller);
 }
 
+/**
+ * @brief Scan for user input events in SDL
+ *
+ * @return The event detected
+ */
 static Event scanEventSdl() {
   SDL_Event event;
   Event res = NO_EVENT;

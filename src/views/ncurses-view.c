@@ -25,6 +25,9 @@ const unsigned gameOverWidth = 31, gameOverHeight = 9;
 // Game Window
 WINDOW *gameWin = NULL;
 
+/**
+ * @brief Destroy the main menu window
+ */
 static void destroyMainMenuNcurses() {
   if (mainMenu != NULL) {
     wclear(mainMenu);
@@ -41,6 +44,9 @@ static void destroyMainMenuNcurses() {
   }
 }
 
+/**
+ * @brief Destroy the credits menu window
+ */
 static void destroyCreditsMenuNcurses() {
   if (creditsMenu != NULL) {
     wclear(creditsMenu);
@@ -57,6 +63,9 @@ static void destroyCreditsMenuNcurses() {
   }
 }
 
+/**
+ * @brief Destroy the game over menu window
+ */
 static void destroyGameOverNcurses() {
   if (gameOverMenu != NULL) {
     wclear(gameOverMenu);
@@ -73,6 +82,11 @@ static void destroyGameOverNcurses() {
   }
 }
 
+/**
+ * @brief Update and draw the main menu
+ *
+ * @param controller The controller containing the model
+ */
 static void updateMainMenuNcurses(Controller *controller) {
   unsigned selected = controller->model->mainMenu.selected;
 
@@ -97,6 +111,11 @@ static void updateMainMenuNcurses(Controller *controller) {
   wrefresh(mainMenu);
 }
 
+/**
+ * @brief Update and draw the credits menu
+ *
+ * @param controller The controller containing the model
+ */
 static void updateCreditsMenuNcurses(Controller *controller) {
   unsigned selected = controller->model->creditsMenu.selected;
 
@@ -123,6 +142,11 @@ static void updateCreditsMenuNcurses(Controller *controller) {
   wrefresh(creditsMenu);
 }
 
+/**
+ * @brief Update and draw the game over menu
+ *
+ * @param controller The controller containing the model
+ */
 static void updateGameOverMenuNcurses(Controller *controller) {
   unsigned selected = controller->model->gameOverMenu.selected;
 
@@ -159,6 +183,11 @@ static void updateGameOverMenuNcurses(Controller *controller) {
   wrefresh(gameOverMenu);
 }
 
+/**
+ * @brief Create the main menu window
+ *
+ * @param controller The controller containing the model
+ */
 static void createMainMenuNcurses(Controller *controller) {
   if (mainMenu != NULL)
     delwin(mainMenu);
@@ -168,6 +197,11 @@ static void createMainMenuNcurses(Controller *controller) {
   updateMainMenuNcurses(controller);
 }
 
+/**
+ * @brief Create the credits menu window
+ *
+ * @param controller The controller containing the model
+ */
 static void createCreditsMenuNcurses(Controller *controller) {
   if (creditsMenu != NULL)
     delwin(creditsMenu);
@@ -177,6 +211,11 @@ static void createCreditsMenuNcurses(Controller *controller) {
   updateCreditsMenuNcurses(controller);
 }
 
+/**
+ * @brief Create the game over menu window
+ *
+ * @param controller The controller containing the model
+ */
 static void createGameOverMenuNcurses(Controller *controller) {
   if (gameOverMenu != NULL)
     delwin(gameOverMenu);
@@ -186,6 +225,9 @@ static void createGameOverMenuNcurses(Controller *controller) {
   updateGameOverMenuNcurses(controller);
 }
 
+/**
+ * @brief Destroy the game window
+ */
 static void destroyGameNcurses() {
   if (gameWin != NULL) {
     wclear(gameWin);
@@ -197,6 +239,11 @@ static void destroyGameNcurses() {
   }
 }
 
+/**
+ * @brief Update and draw the game
+ *
+ * @param controller The controller containing the model
+ */
 static void updateGameNcurses(Controller *controller) {
   wclear(gameWin);
   wresize(gameWin, maxHeight, maxWidth);
@@ -347,6 +394,11 @@ static void updateGameNcurses(Controller *controller) {
   wrefresh(gameWin);
 }
 
+/**
+ * @brief Create the game window
+ *
+ * @param controller The controller containing the model
+ */
 static void createGameNcurses(Controller *controller) {
   if (gameWin != NULL)
     delwin(gameWin);
@@ -354,6 +406,11 @@ static void createGameNcurses(Controller *controller) {
   updateGameNcurses(controller);
 }
 
+/**
+ * @brief Initialize the ncurses view
+ *
+ * @param controller The controller
+ */
 static void initViewNcurses(Controller *controller) {
   initscr();
   cbreak();
@@ -368,12 +425,20 @@ static void initViewNcurses(Controller *controller) {
   createMainMenuNcurses(controller);
 }
 
+/**
+ * @brief Close the ncurses view and cleanup
+ */
 static void closeViewNcurses() {
   destroyMainMenuNcurses();
   destroyGameNcurses();
   endwin();
 }
 
+/**
+ * @brief Scan for user input events in ncurses
+ *
+ * @return The event detected
+ */
 static Event scanEventNcurses() {
   Event res = NO_EVENT;
   int ch;
@@ -413,6 +478,11 @@ static Event scanEventNcurses() {
   return res;
 }
 
+/**
+ * @brief Handle resize events for ncurses
+ *
+ * @param controller The controller
+ */
 static void resizeNcurses(Controller *controller) {
   getmaxyx(stdscr, maxHeight, maxWidth);
   if (mainMenu != NULL)
