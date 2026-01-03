@@ -444,6 +444,7 @@ static Event scanEventNcurses() {
   int ch;
   while ((ch = getch()) != ERR) {
     switch (ch) {
+    case 'w':
     case 'z':
     case KEY_UP:
       res |= EVENT_KEY_UP;
@@ -452,6 +453,7 @@ static Event scanEventNcurses() {
     case KEY_DOWN:
       res |= EVENT_KEY_DOWN;
       break;
+    case 'a':
     case 'q':
     case KEY_LEFT:
       res |= EVENT_KEY_LEFT;

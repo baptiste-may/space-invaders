@@ -669,6 +669,7 @@ static Event scanEventSdl() {
       break;
     case SDL_EVENT_KEY_DOWN:
       switch (event.key.key) {
+      case SDLK_W:
       case SDLK_Z:
       case SDLK_UP:
         res |= EVENT_KEY_UP;
@@ -689,7 +690,8 @@ static Event scanEventSdl() {
   }
 
   const bool *state = SDL_GetKeyboardState(NULL);
-  if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_Q])
+  if (state[SDL_SCANCODE_LEFT] || state[SDL_SCANCODE_Q] ||
+      state[SDL_SCANCODE_A])
     res |= EVENT_KEY_LEFT;
   if (state[SDL_SCANCODE_RIGHT] || state[SDL_SCANCODE_D])
     res |= EVENT_KEY_RIGHT;
